@@ -1,6 +1,6 @@
 
 
-const factoryProject = (name) => {
+const projectFactory = (name) => {
 
     let tasks = []
     // might have to change to let if it doesn't allow changes to array
@@ -32,4 +32,4 @@ const factoryProject = (name) => {
     return { getName, setName, getTask, getTasks, setTask, deleteTask };
 }
 
-export default { factoryProject };
+export default { projectFactory };
