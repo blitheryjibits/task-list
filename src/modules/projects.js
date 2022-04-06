@@ -1,35 +1,42 @@
 
+const Project_proto = {
+    getName () { return this.name },
 
-const projectFactory = (name) => {
-
-    let tasks = []
-    // might have to change to let if it doesn't allow changes to array
-
-    const getName = () => {
-        return name;
-    }
-
-    const setName = newName => {
-        name = newName;
-    }
+    setName (newName) { return this.name = newName },
     
-    const getTasks = () => {
-        return tasks;
-    }
+    getTasks () { return this.tasks },
 
-    const getTask = taskName => {
-        return tasks.find((task) => task.getName === taskName);
-    }
+    getTask (taskName) { return this.tasks.find((task) => task.getName() === taskName) },
 
-    const setTask = newTask => {
-        if (tasks.find((task) => task.getName === newTask.name)) return
-        tasks.push(newTask);
-    }
+    setTask (newTask) {
+        if (this.tasks.find((task) => task.getName() === newTask.getName() )) return; 
+        this.tasks.push(newTask) 
+    },
 
-    const deleteTask = taskName => {
-        tasks = tasks.filter((task) => task.getName !== taskName);
-    }
-    return { getName, setName, getTask, getTasks, setTask, deleteTask };
+    setTasks (tasks) { tasks.forEach(task => this.tasks.push(task)) },
+
+    deleteTask (taskName) {
+        let tempTasks = this.tasks.filter((task) => task.getName() !== taskName)
+        for (let i = this.tasks.length-1; i >= 0; i--) this.tasks.pop()
+        tempTasks.forEach((task) => this.tasks.push(task)) 
+    },
+
+    deleteTasks (tasks) { for (let i = this.tasks.length-1; i >= 0; i--) this.tasks.pop() }
 }
 
-export default { projectFactory };
+const CreateProject = (name) => {
+    return Object.create(Project_proto, {
+        name: { 
+            value: name, 
+            enumerable:true,
+            writable: true
+        },
+        tasks: { 
+            value: [], 
+            enumerable:true,
+            writable: true
+        }
+    })
+}
+
+export { CreateProject, Project_proto };

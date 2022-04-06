@@ -1,20 +1,37 @@
-//import taskFactory from './task';
 import projectFactory from './projects'
 
-const list = () => {
-
-    let projects = [];
-
-    const getProjects = () => { return projects; }
-    const getProject = (projectName) => { return projects.find((project) => project.getName() === projectName); }
-    const setProject = (project) => { projects.push(project); }
-
-    const deleteProject = (projectName) => { 
-        let tempArray = projects.filter((project) => project.getName !== projectName);
-        projects = tempArray;
-     }
+const List_proto = {
+    getProjects () { return this.projects },
     
-    return { getProject, getProjects, setProject, deleteProject };
+    getProject (projectName) { 
+        return this.projects.find((project) => 
+        project.getName() === projectName) 
+    },
+    
+    setProject (project) { this.projects.push(project) },
+
+    setProjects (projects) { 
+        projects.forEach(project => 
+        this.projects.push(project)) 
+    },
+    
+    deleteProject  (projectName) { 
+        let tempArray = this.projects.filter((project) => project.getName() !== projectName);
+        for (let i = this.projects.length-1; i >= 0; i--) this.projects.pop();
+        tempArray.forEach(project => this.projects.push(project));
+    },
+
+    deleteProjects () { for (let i = this.projects.length-1; i >= 0; i--) this.projects.pop() }
 }
 
-export default { list };
+const CreateList = () => {
+    return Object.create(List_proto, {
+        projects: { 
+            value: [], 
+            enumerable: true,
+            writable: true,
+        },
+    })
+}
+
+export { CreateList };

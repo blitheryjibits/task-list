@@ -1,21 +1,50 @@
-import { format, isDate } from 'date-fns';
+import { format, isDate, toDate } from 'date-fns';
 
-const taskFactory = (name) => {
-    let description = "";
-    let dueDate = "no date";
 
-    const getName = () => { return name; }
-    const setName = (newName) => { name = newName; }
+const Task_proto = {
+    getName() { return this.name; },
+    setName(newName) { return this.name = newName; },
 
-    const setDescription = (details) => { description = details; }
-    const getDescription = () => { return description; }
-
-    const setDueDate = (date) => { dueDate = date; }
-    const getFormattedDate = () => {
-        if (isDate(dueDate)) return format(dueDate, 'dd MMM yyyy');
-    }
+    setDescription(details) { return this.description = details; },
+    getDescription() { return this.description; },
     
-    return { getName, setName, getDescription, setDescription, setDueDate, getFormattedDate }
+    setDueDate(date) { return this.dueDate.value = date },
+    getFormattedDate() {
+        if (isDate(this.dueDate.value)) 
+        return format(this.dueDate.value, 'dd MMM yyyy');
+    },
+
+    setPriority(level) { 
+        if (this.priority.length > 0) this.priority.pop()
+        this.priority.push(level)
+    },
+
+    getPriority() { return this.priority}
 }
 
-export default { taskFactory };
+const CreateTask = (name) => {
+    return Object.create(Task_proto, {
+        name: { 
+            value: name, 
+            enumerable:true,
+            writable:true
+        },
+        description: { 
+            value: "no description", 
+            enumerable:true,
+            writable:true
+        },
+        dueDate: {
+            value: Date, 
+            enumerable:true,
+            writable:true
+        },
+        priority: {
+            value: 'none', 
+            enumerable:true,
+            writable:true
+        }
+    });
+}
+    
+export { CreateTask, Task_proto };
