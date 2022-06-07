@@ -9,15 +9,53 @@
     <title>Document</title>
 </head>
 <body>
+    
     <header>
         <div>Get It Together, Man!!</div>
     </header>
     <main>
-        <nav class="nav">
-            <button class="default-projects today-project"></button>
+        <nav class="nav" id="nav-left">
+            <button class="button project">project 1</button>
+            <button class="button project">project 2</button>
+            <button class="button project">project 3</button>
+            <button class="button project">project 4</button>
+            <button class="button project">project 5</button>
+            <button class="button project">project 6</button>
+            <button class="button project">project 7</button>
+            <button class="button project">project 8</button>
+            <button class="button project">project 9</button>
+            <button class="button project">project 10</button>
+            <button class="button project">project 11</button>
+            <button class="button add-project submit">Add Project</button>
         </nav>
-        <div class="project-list-view"></div>
+
+        <div class="project-list-view">
+            <div class="taskbox">
+                <div class="task">
+                    <label class="checkbox" for="checkbox">
+                        <input class="checkbox__input" type="checkbox" name="checkbox-name" id ="checkbox">
+                        <div class="checkbox__box"></div>
+                        this is a task
+                    </label>
+                    <!-- <p class="task-text">this is a new task</p> -->
+                    <!-- <input class="task-date" type="date"> -->
+                </div>
+                <button class="button add-task submit">Add Task</button>
+            </div>
+            
+            <div class="new-project-box display">
+                <p>Project Name</p>
+                <div class="project-data">
+                    <input class="project-name" type="text">
+                </div>
+                <div class="project-button-box">
+                    <button class="button submit">Submit</button>
+                    <button class="button cancel">Cancel</button>    
+                </div>
+            </div>
+
+        </div>
     </main>
-    <footer></footer>
+    <footer class="footer">This is sometimes desired by people with wierd fetishes</footer>
 </body>
 </html>
