@@ -7,6 +7,7 @@ const storage = {
     saveList (data) { localStorage.setItem('list', JSON.stringify(data)) },
     
     getList () { 
+        if (localStorage.getItem('list') === null) this.saveList(CreateList());
         const _list = Object.assign(CreateList(), JSON.parse(localStorage.getItem('list')));
         
         //Retrieve Projects and change __proto__
