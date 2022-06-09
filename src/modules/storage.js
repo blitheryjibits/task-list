@@ -4,7 +4,9 @@ import { CreateList } from './list';
 
 const storage = {
 
-    saveList (data) { localStorage.setItem('list', JSON.stringify(data)) },
+    saveList (data) { 
+        if (localStorage.getItem('list') !== null) this.deleteList();
+        localStorage.setItem('list', JSON.stringify(data)) },
     
     getList () { 
         if (localStorage.getItem('list') === null) this.saveList(CreateList());
@@ -17,9 +19,13 @@ const storage = {
         
         // Retrieve tasks and change __proto__
         _list.getProjects().forEach(project => {
-            let tempTasks = project.getTasks().map(task => Object.assign(CreateTask(), task));
-            project.deleteTasks();
-            project.setTasks(tempTasks)
+            let tempTasks = project.getTasks()
+            if ( tempTasks.length > 0 ) {
+                tempTasks.map(task => Object.assign(CreateTask(), {task}));
+                project.deleteTasks();
+                project.setTasks(tempTasks)
+                
+                }
             });
 
         return _list;
@@ -52,7 +58,13 @@ const storage = {
         this.saveList(_list);
     },
 
-    saveTask () {},
+    saveTask (project, task) {
+        const _list = this.getList();
+        // _list.getProject(project.getName()).setTask(task)
+        project.setTask(task)
+        _list.setProject(project)
+        this.saveList(_list);
+    },
     getTask () {},
     deleteTask () {},
     renameTask () {}
