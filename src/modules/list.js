@@ -8,7 +8,12 @@ const List_proto = {
         project.getName() === projectName) 
     },
     
-    setProject (project) { this.projects.push(project) },
+    setProject (project) { 
+        const old = this.projects.find((existing) => existing.getName() === project.getName());
+        //console.log(old);
+        if(old !== undefined) this.deleteProject(old.getName()); 
+        this.projects.push(project);
+    },
 
     setProjects (projects) { 
         projects.forEach(project => 
