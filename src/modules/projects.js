@@ -9,8 +9,9 @@ const Project_proto = {
     getTask (taskName) { return this.tasks.find((task) => task.getName() === taskName) },
 
     setTask (newTask) {
-        if (this.tasks.find((task) => task.getName() === newTask.getName() )) return; 
-        this.tasks.push(newTask) 
+        if (this.tasks.find((task) => task.getName() === newTask.getName() ))
+            return console.log(`${newTask.getName()} already exists`);
+        this.tasks.push(newTask)
     },
 
     setTasks (tasks) { tasks.forEach(task => this.tasks.push(task)) },
@@ -21,7 +22,17 @@ const Project_proto = {
         tempTasks.forEach((task) => this.tasks.push(task)) 
     },
 
-    deleteTasks (tasks) { for (let i = this.tasks.length-1; i >= 0; i--) this.tasks.pop() }
+    deleteTasks () { for (let i = this.tasks.length-1; i >= 0; i--) this.tasks.pop() },
+
+    replaceTask (newTask) {
+        if (this.tasks.find((task) => task.getName() === newTask.getName() )) {
+            let index = this.tasks.findIndex( element => {
+            if (element.name === newTask.getName()) return true });
+            this.tasks.splice(index,1,newTask)
+        } else {
+            this.tasks.push(newTask)
+        }
+    }
 }
 
 const CreateProject = (name) => {
