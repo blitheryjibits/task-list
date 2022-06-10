@@ -60,7 +60,10 @@ const storage = {
         _list.getProject(project.getName()).setTask(task)
         this.saveList(_list);
     },
-    getTask () {},
+    getTask (project, task) {
+        const _list = this.getList();
+        return _list.getProject(project.getName()).getTask(task)
+    },
     deleteTask () {},
     renameTask () {}
 }
