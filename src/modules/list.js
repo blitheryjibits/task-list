@@ -9,10 +9,10 @@ const List_proto = {
     },
     
     setProject (project) { 
-        const old = this.projects.find((existing) => existing.getName() === project.getName());
-        //console.log(old);
-        if(old !== undefined) this.deleteProject(old.getName()); 
-        this.projects.push(project);
+        if (this.projects.find((existing) => existing.getName() === project.getName())) 
+            return console.log(`${project.getName()} already exists`);
+        this.projects.push(project); 
+        
     },
 
     setProjects (projects) { 
