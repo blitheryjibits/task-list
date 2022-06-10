@@ -6,7 +6,7 @@ const Project_proto = {
     
     getTasks () { return this.tasks },
 
-    getTask (taskName) { return this.tasks.find((task) => task.getName() === taskName) },
+    getTask (task) { return this.tasks.find((_task) => _task.getName() === task.getName()) },
 
     setTask (newTask) {
         if (this.tasks.find((task) => task.getName() === newTask.getName() ))
