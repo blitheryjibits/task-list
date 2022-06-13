@@ -22,7 +22,6 @@ const storage = {
             let tempTasks = project.getTasks().map(task => Object.assign(CreateTask(), task));
                 project.deleteTasks();
                 project.setTasks(tempTasks)
-                
             });
 
         return _list;
@@ -32,6 +31,7 @@ const storage = {
         localStorage.removeItem('list');
     },
 
+    // Functions for accessing Projects in Local Storage //
     addProject (project) { 
         const _list = this.getList();
         _list.setProject(project);
@@ -55,17 +55,31 @@ const storage = {
         this.saveList(_list);
     },
 
+    // Functions for accessing Tasks in Local Storage //
     addTask (project, task) {
         const _list = this.getList();
-        _list.getProject(project.getName()).setTask(task)
+        typeof project === 'string' ?
+        _list.getProject(project).setTask(task) :
+        _list.getProject(project.getName()).setTask(task);
         this.saveList(_list);
     },
+
     getTask (project, task) {
         const _list = this.getList();
         return _list.getProject(project.getName()).getTask(task)
     },
-    deleteTask () {},
-    renameTask () {}
+
+    deleteTask (project, task) {
+        const _list = this.getList();
+        _list.getProject(project.getName()).deleteTask(task.getName());
+        this.saveList(_list);
+    },
+
+    renameTask (project, task, newName) {
+        const _list = this.getList();
+        _list.getProject(project.getName()).getTask(task.getName()).setName(newName);
+        this.saveList(_list);
+    }
 }
 
 export { storage };
