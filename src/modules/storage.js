@@ -79,7 +79,14 @@ const storage = {
         const _list = this.getList();
         _list.getProject(project.getName()).getTask(task.getName()).setName(newName);
         this.saveList(_list);
+    },
+    
+    update_task_date (project, task, date) {
+        const _list = this.getList();
+        _list.getProject(project.getName()).getTask(task.getName()).setDueDate(date)
+        this.saveList(_list)
     }
+
 }
 
 export { storage };
