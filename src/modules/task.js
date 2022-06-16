@@ -1,5 +1,5 @@
 import { format, isDate, toDate } from 'date-fns';
-
+import parseISO from 'date-fns/parseISO'
 
 const Task_proto = {
     getName() { return this.name; },
@@ -8,10 +8,9 @@ const Task_proto = {
     setDescription(details) { return this.description = details; },
     getDescription() { return this.description; },
     
-    setDueDate(date) { return this.dueDate.value = date },
+    setDueDate(date) { this.dueDate = parseISO(date)},
     getFormattedDate() {
-        if (isDate(this.dueDate.value)) 
-        return format(this.dueDate.value, 'dd MMM yyyy');
+        return format(parseISO(this.dueDate), 'yyyy-MM-dd');
     },
 
     setPriority(level) { 
@@ -22,7 +21,7 @@ const Task_proto = {
     getPriority() { return this.priority}
 }
 
-const CreateTask = (name) => {
+const CreateTask = (name, date) => {
     return Object.create(Task_proto, {
         name: { 
             value: name, 
@@ -35,7 +34,7 @@ const CreateTask = (name) => {
             writable:true
         },
         dueDate: {
-            value: Date, 
+            value: date || new Date(), 
             enumerable:true,
             writable:true
         },
