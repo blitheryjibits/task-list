@@ -1,12 +1,12 @@
-import { format, isDate, toDate } from 'date-fns';
+import { format } from 'date-fns';
 import parseISO from 'date-fns/parseISO'
 
 const Task_proto = {
     getName() { return this.name; },
     setName(newName) { return this.name = newName; },
 
-    setDescription(details) { return this.description = details; },
-    getDescription() { return this.description; },
+    setStatus() { this.status? false : true }, // true if task is completed
+    getStatus() { return this.status; },
     
     setDueDate(date) { this.dueDate = parseISO(date)},
     getFormattedDate() {
@@ -17,7 +17,6 @@ const Task_proto = {
         if (this.priority.length > 0) this.priority.pop()
         this.priority.push(level)
     },
-
     getPriority() { return this.priority}
 }
 
@@ -28,8 +27,8 @@ const CreateTask = (name, date) => {
             enumerable:true,
             writable:true
         },
-        description: { 
-            value: "no description", 
+        status: { 
+            value: false, 
             enumerable:true,
             writable:true
         },
