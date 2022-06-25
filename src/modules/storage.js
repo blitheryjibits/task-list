@@ -66,24 +66,32 @@ const storage = {
 
     getTask (project, task) {
         const _list = this.getList();
-        return _list.getProject(project.getName()).getTask(task)
+        return _list.getProject(project === typeof 'string'?project: project.getName())
+        .getTask(task)
     },
 
     deleteTask (project, task) {
         const _list = this.getList();
-        _list.getProject(project.getName()).deleteTask(task.getName());
+        _list.getProject(project).deleteTask(task);
         this.saveList(_list);
     },
 
     renameTask (project, task, newName) {
         const _list = this.getList();
-        _list.getProject(project.getName()).getTask(task.getName()).setName(newName);
+        _list.getProject(project).getTask(task).setName(newName);
         this.saveList(_list);
     },
     
     update_task_date (project, task, date) {
         const _list = this.getList();
-        _list.getProject(project.getName()).getTask(task.getName()).setDueDate(date)
+        _list.getProject(project).getTask(task).setDueDate(date)
+        this.saveList(_list)
+    },
+
+    update_timed_projects () {
+        const _list = this.getList();
+        _list.update_today()
+        _list.update_week()
         this.saveList(_list)
     }
 
