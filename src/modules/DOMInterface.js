@@ -10,7 +10,6 @@ const UI = {
 
     loadPage () {
         localStorage.clear();
-        //let _list = storage.getList();
         UI.load_default_projects();
         UI.create_temp_projects();
         UI.create_temp_tasks('Today', 'first task')
@@ -18,15 +17,16 @@ const UI = {
         UI.create_temp_tasks('Today', 'third task')
         UI.load_projects();
         UI.init_project_buttons();
-        UI.init_add_task_button(); 
+        UI.init_add_task_button();
+        let _list = storage.getList();
+        _list.setCurrent(_list.getProject('Today'))
+        storage.saveList(_list)
     },
     
-    project_pointer (project) {
-        const current_project = project
-        const update = (project) => {current_project = project}
-        const get = () => {return current_project}
-        return {update, get}
+    find_current_project () {
+        return storage.getList().getCurrent()
     },
+
 
     load_projects() {
         const list = storage.getList().getProjects();
@@ -83,25 +83,30 @@ const UI = {
     },
 
     load_tasks (e) {
-        const projects = storage.getList().getProjects();
-        const project = projects.find(project => project.getName() === e.target.innerText)
+        const list = storage.getList()
+        const project = list.getProject(e.target.innerText)
+        list.setCurrent(project)
         const tasks = project.getTasks()
-///////////////////////////////////////////
-        const current_project = UI.project_pointer({project})
-        console.log(current_project.get())
         UI.clear_tasks()
         UI.create_task_preview(tasks)
+        storage.saveList(list)
+    },
+    
+    init_project_buttons () {
+        const buttons = document.querySelectorAll('button.project')
+        buttons.forEach(button => {
+            button.addEventListener('click', this.load_tasks, false)
+        })
     },
 
 // Create elements for each task and add to DOM for display //
     create_task_preview (tasks) {
         const task_preview = document.querySelector('.task__box')
         tasks.forEach(task => {
-            //const name = task.getName()
             const task_box = document.createElement('div')
                 task_box.classList.add('task')
             const task_label = document.createElement('label')
-             task_label.classList.add('checkbox-and-label-container')
+                task_label.classList.add('checkbox-and-label-container')
             const text = document.createTextNode(`${task.getName()}`)
         // Create checkbox //
             const checkbox_input = document.createElement('input')
@@ -174,12 +179,17 @@ const UI = {
     },
 
     log_submit (e) {
+        // Create new task and add to current project
         const task_name = e.target[0].value
         const task_date = e.target[1].value
         const new_task = CreateTask(task_name)
+        const project = storage.getList().getCurrent()
         new_task.setDueDate(task_date)
-        storage.addTask('Today', new_task)
+        storage.addTask(project, new_task)
+        storage.update_timed_projects()
         UI.remove_form()
+        UI.clear_tasks()
+        UI.create_task_preview(storage.getProject(project).getTasks())
         e.preventDefault()
     },
 
@@ -195,14 +205,8 @@ const UI = {
     update_date (e) {
         const date = e.target.value
         const name = e.target.parentNode.parentNode.children[0].innerText
-        console.log(name)
-    },
-
-    init_project_buttons () {
-        const buttons = document.querySelectorAll('button.project')
-        buttons.forEach(button => {
-            button.addEventListener('click', this.load_tasks, false)
-        })
+        const project = storage.getList().getCurrent()
+        storage.update_task_date(project, name, date)
     }
 
 }
