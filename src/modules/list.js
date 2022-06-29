@@ -13,7 +13,7 @@ const List_proto = {
 
     setCurrent (project) { 
         this.getProjects().forEach( (item) => { if (item.getCurrent()) item.setCurrent()})
-        project.setCurrent()},
+        this.getProject(project).setCurrent()},
     
     getCurrent () {
         return this.getProjects().find( (project) => project.getCurrent())
