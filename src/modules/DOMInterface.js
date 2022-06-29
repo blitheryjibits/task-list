@@ -1,10 +1,14 @@
 import { CreateProject } from "./projects";
 import { CreateTask } from "./task";
-import { CreateList } from './list';
 import { storage } from "./storage";
-import { format, isDate, toDate } from 'date-fns';
-import parseISO from 'date-fns/parseISO'
+import { format } from 'date-fns';
 
+//  ToDo
+//  - create logic to update Month project in list module
+//  - remove ridiculous projects and task, 
+//      - replace with reasonable task and project
+//  - finish styling with CSS
+//      - add any interactive motion
  
 const UI = {
 
@@ -12,12 +16,9 @@ const UI = {
         localStorage.clear();
         UI.load_default_projects();
         UI.create_temp_projects();
-        UI.create_temp_tasks('Today', 'first task')
-        UI.create_temp_tasks('Today', 'second task')
-        UI.create_temp_tasks('Today', 'third task')
         UI.load_projects();
-        UI.init_project_buttons();
         UI.init_add_task_button();
+        UI.init_add_project_button();
         let _list = storage.getList();
         _list.setCurrent(_list.getProject('Today'))
         storage.saveList(_list)
@@ -31,6 +32,7 @@ const UI = {
     load_projects() {
         const list = storage.getList().getProjects();
         UI.init_projects(list)
+        UI.init_project_buttons()
     },
     
     load_default_projects () {
@@ -55,33 +57,43 @@ const UI = {
             default_projects_container.appendChild(button)
        });
     },
+
 // Displays loaded projects as buttons in API - called in load_projects//
     init_projects(list) {
-    const projects_container = document.querySelector('.projects')
-    const add_project = document.querySelector(`.projects > .add-project`)
-    list.forEach(project => {
-        let name = project.getName();
-        if (name !== 'Today' && name !== 'This Week' && name !== 'This Month' ) {
-            const button = document.createElement('button')
-            button.classList.add('button', 'project')
-            button.textContent = `${name}`
-            projects_container.insertBefore(button, add_project)
+        const projects_container = document.querySelector('.projects')
+        while (projects_container.children.length > 1) {
+            projects_container.removeChild(projects_container.firstChild)
         }
-    });
+        const add_project = document.querySelector(`.projects > .add-project`)
+        list.forEach(project => {
+            let name = project.getName();
+            if (name !== 'Today' && name !== 'This Week' && name !== 'This Month' ) {
+                const button = document.createElement('button')
+                button.classList.add('button', 'project')
+                button.textContent = `${name}`
+                projects_container.insertBefore(button, add_project)
+            }
+        });
     },
 
+// Temporary projects for content on start up //
     create_temp_projects () {
         storage.addProject(CreateProject('temp proj 1'))
         storage.addProject(CreateProject('temp proj 2'))
-        storage.addProject(CreateProject('temp proj 3'))
-        storage.addProject(CreateProject('temp proj 4'))
-
     },
 
-    create_temp_tasks (project, taskName) {
+    create_temp_tasks () {
+        UI.create_temp_task('Today', 'first task')
+        UI.create_temp_task('Today', 'second task')
+        UI.create_temp_task('Today', 'third task')
+    },
+
+    create_temp_task (project, taskName) {
         storage.addTask(project, CreateTask(taskName))
     },
-
+//////////////////////////////////////////////
+  
+// Logic for loading tasks when a project button is clicked in the API //
     load_tasks (e) {
         const list = storage.getList()
         const project = list.getProject(e.target.innerText)
@@ -97,6 +109,20 @@ const UI = {
         buttons.forEach(button => {
             button.addEventListener('click', this.load_tasks, false)
         })
+    },
+
+    init_add_task_button () {
+        const button = document.querySelector('button.add-task')
+        button.addEventListener('click', UI.create_task_form, false)
+    },
+
+    init_add_project_button() {
+        const add_project = document.querySelector(`.projects > .add-project`)
+        add_project.addEventListener('click', UI.add_new_project, false)
+    },
+
+    add_new_project() {
+        UI.create_project_form()
     },
 
 // Create elements for each task and add to DOM for display //
@@ -132,11 +158,6 @@ const UI = {
         }
     },
 
-    init_add_task_button () {
-        const button = document.querySelector('button.add-task')
-        button.addEventListener('click', UI.create_task_form, false)
-    },
-
     create_date_element (date) {
         const date_label = document.createElement('label')
             date_label.classList.add('task-date')
@@ -151,15 +172,13 @@ const UI = {
         return date_label
     },
 
-// Task form is for adding new tasks to storage //
-    create_task_form () {
-        const task_box = document.querySelector('.task__box')
+    create_partial_form () {
         const div = document.createElement('div')
             div.classList.add('div-form')
         const form = document.createElement('form')
-            form.classList.add('task-submit-form')
+            form.classList.add('submit-form')
         const label = document.createElement('label')
-        const input =  document.createElement('input')
+        const input = document.createElement('input')
             input.setAttribute('type', 'text')
         const submit_button = document.createElement('button')
             submit_button.setAttribute('type', 'submit')
@@ -167,13 +186,40 @@ const UI = {
         const cancel_button = document.createElement('button')
             cancel_button.setAttribute('type', 'reset')
             cancel_button.textContent = `Cancel`
+        
+        label.append(input)
+        form.append(label, submit_button, cancel_button)
+        div.append(form)
+        return div
+    },
+
+// Project form is for adding new projects to storage //
+    create_project_form () {
+        const task_box = document.querySelector('.task__box')
+        const div = UI.create_partial_form()
+    // Display form //   
+        UI.clear_tasks();
+        task_box.append(div)
+        const form = document.querySelector('.submit-form')
+            form.classList.add('project')
+            form.addEventListener('submit', UI.log_project_submit)
+            form.addEventListener('reset', UI.remove_form)
+    },
+
+// Task form is for adding new tasks to storage //
+    create_task_form () {
+        const div = UI.create_partial_form()
+        const form = div.querySelector('.submit-form')
+        const button = div.querySelector('.submit-form > button')
+        const task_box = document.querySelector('.task__box')
+       
     // Date elements //
         const date = UI.create_date_element(format(Date.now(), 'yyyy-MM-dd'));
+
     // Display form //    
-        label.append(input)
-        form.append(label, date, submit_button, cancel_button)
+        form.insertBefore(date, button)////////////////////////////////////////
         form.addEventListener('submit', UI.log_submit)
-        form.addEventListener('reset', UI.log_cancel_submit)
+        form.addEventListener('reset', UI.remove_form)
         div.append(form)
         task_box.append(div)
     },
@@ -192,9 +238,17 @@ const UI = {
         UI.create_task_preview(storage.getProject(project).getTasks())
         e.preventDefault()
     },
-
-    log_cancel_submit (e) {
+    
+    log_project_submit (e) {
+        // Create new project and set to current project
+        const project_name = e.target[0].value
+        const new_project = CreateProject(project_name)
+        storage.addProject(new_project)
+        storage.update_current(new_project)
         UI.remove_form()
+        UI.clear_tasks()
+        UI.load_projects()
+        e.preventDefault()
     },
 
     remove_form () {
