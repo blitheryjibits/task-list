@@ -93,6 +93,12 @@ const storage = {
         _list.update_today()
         _list.update_week()
         this.saveList(_list)
+    },
+
+    update_current (current_project) {
+        const _list = this.getList();
+        _list.setCurrent(current_project)
+        this.saveList(_list)
     }
 
 }
