@@ -105,7 +105,7 @@ main {
     border-radius: 20px;
 }
 
-.task-submit-form {
+.submit-form {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -113,38 +113,40 @@ main {
     height: 5rem;
 }
 
-.task-submit-form>label {
+.submit-form>label {
     display: flex;
     width: 70%;
     float:left;
     justify-content: center;
 }
-.task-submit-form>label>input {
+.submit-form>label>input {
         line-height: 1.4rem;
         width: 80%;
         float: left;
 }
-.task-submit-form>.task-date {
-    width: 20%;
-    line-height: 1.4rem;
-    align-items: center;
-}
-/* .task-submit-form>.date {
-    
-} */
 
-.task-submit-form>button {
+.submit-form>button {
     height: 1.4rem;
     width: 10%;
     border-radius: 10px;
     margin: 0 10%;
 }
-.task-submit-form>button[type=submit] {
+.submit-form>button[type=submit] {
     background-color: #45EB9B;
 }
-.task-submit-form>button[type=cancel] {
+.submit-form>button[type=cancel] {
     background-color: #c3422c;
 }
+
+.submit-form>.task-date {
+    width: 20%;
+    line-height: 1.4rem;
+    align-items: center;
+}
+
+/* .submit-form.project {
+
+} */
 
 /* Custom Check Box Styling */
 .checkbox {
