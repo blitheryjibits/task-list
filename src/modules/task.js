@@ -5,19 +5,13 @@ const Task_proto = {
     getName() { return this.name; },
     setName(newName) { return this.name = newName; },
 
-    setStatus() { this.status? false : true }, // true if task is completed
+    setStatus() { this.status? this.status = false : this.status = true; }, // true if task is completed
     getStatus() { return this.status; },
     
-    setDueDate(date) { this.dueDate = parseISO(date)},
+    setDueDate(date) { this.dueDate = date},
     getFormattedDate() {
         return format(parseISO(this.dueDate), 'yyyy-MM-dd');
     },
-
-    setPriority(level) { 
-        if (this.priority.length > 0) this.priority.pop()
-        this.priority.push(level)
-    },
-    getPriority() { return this.priority}
 }
 
 const CreateTask = (name, date) => {
@@ -34,11 +28,6 @@ const CreateTask = (name, date) => {
         },
         dueDate: {
             value: date || new Date(), 
-            enumerable:true,
-            writable:true
-        },
-        priority: {
-            value: 'none', 
             enumerable:true,
             writable:true
         }
