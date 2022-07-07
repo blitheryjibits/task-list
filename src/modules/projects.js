@@ -31,9 +31,10 @@ const Project_proto = {
     deleteTasks () { for (let i = this.tasks.length-1; i >= 0; i--) this.tasks.pop() },
 
     replaceTask (newTask) {
-        if (this.tasks.find((task) => task.getName() === newTask.getName() )) {
+        const name = typeof newTask === 'string' ? newTask : newTask.getName()
+        if (this.tasks.find((task) => task.getName() === name )) {
             let index = this.tasks.findIndex( element => {
-            if (element.name === newTask.getName()) return true });
+            if (element.name === name) return true });
             this.tasks.splice(index,1,newTask)
         } else {
             this.tasks.push(newTask)
