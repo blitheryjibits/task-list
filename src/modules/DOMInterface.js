@@ -4,11 +4,17 @@ import { storage } from "./storage";
 import { format } from 'date-fns';
 
 //  ToDo
-//  - create logic to update Month project in list module
+//  - Display current project name at top of task box
 //  - remove ridiculous projects and task, 
 //      - replace with reasonable task and project
 //  - finish styling with CSS
 //      - add any interactive motion
+//  - Attempt to refactor code
+//
+//  - Add remove/delete buttons for projects and tasks
+//  - determine storage and placement of finished
+//  - Convert default projects to dropdown menu that displays the projects when selected
+//      - Remove listeners and add button when in displaying default projects
  
 const UI = {
 
@@ -16,6 +22,7 @@ const UI = {
         localStorage.clear();
         UI.load_default_projects();
         UI.create_temp_projects();
+        UI.create_temp_tasks();
         UI.load_projects();
         UI.init_add_task_button();
         UI.init_add_project_button();
@@ -42,6 +49,7 @@ const UI = {
             _list.setProject(CreateProject("Today"))
             _list.setProject(CreateProject("This Week"))
             _list.setProject(CreateProject("This Month"))
+            _list.setProject(CreateProject("Overdue"))
             storage.saveList(_list)
         }
         UI.init_default_projects(_list.getProjects())
@@ -67,7 +75,7 @@ const UI = {
         const add_project = document.querySelector(`.projects > .add-project`)
         list.forEach(project => {
             let name = project.getName();
-            if (name !== 'Today' && name !== 'This Week' && name !== 'This Month' ) {
+            if (name !== 'Today' && name !== 'This Week' && name !== 'This Month' && name !== 'Overdue') {
                 const button = document.createElement('button')
                 button.classList.add('button', 'project')
                 button.textContent = `${name}`
@@ -140,11 +148,13 @@ const UI = {
                 checkbox_input.setAttribute('type', 'checkbox')
             const check_box = document.createElement('div')
                 check_box.classList.add('checkbox__box')
+                checkbox_input.checked = task.getStatus()
         // Date elements //
             const date = UI.create_date_element(task.getFormattedDate());
         
         // Insert Task elements in to DOM //
             date.lastChild.addEventListener('change', UI.update_date, false)
+            checkbox_input.addEventListener('change', this.update_status, false)
             task_label.append(checkbox_input, check_box, text)
             task_box.append(task_label, date)
             task_preview.append(task_box)
@@ -217,7 +227,7 @@ const UI = {
         const date = UI.create_date_element(format(Date.now(), 'yyyy-MM-dd'));
 
     // Display form //    
-        form.insertBefore(date, button)////////////////////////////////////////
+        form.insertBefore(date, button)
         form.addEventListener('submit', UI.log_submit)
         form.addEventListener('reset', UI.remove_form)
         div.append(form)
@@ -232,7 +242,7 @@ const UI = {
         const project = storage.getList().getCurrent()
         new_task.setDueDate(task_date)
         storage.addTask(project, new_task)
-        storage.update_timed_projects()
+        storage.update_task_date(project, task_name, task_date) 
         UI.remove_form()
         UI.clear_tasks()
         UI.create_task_preview(storage.getProject(project).getTasks())
@@ -260,7 +270,15 @@ const UI = {
         const date = e.target.value
         const name = e.target.parentNode.parentNode.children[0].innerText
         const project = storage.getList().getCurrent()
-        storage.update_task_date(project, name, date)
+        const task = project.getTask(name)
+        storage.update_task_date(project, task, date)
+    },
+
+    update_status (e) {
+        const task = e.target.parentNode.innerText
+        // const project = storage.getList().getCurrent()
+        // const task = project.getTask(name)
+        storage.update_status(task)
     }
 
 }
