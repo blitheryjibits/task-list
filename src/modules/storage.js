@@ -61,6 +61,7 @@ const storage = {
         typeof project === 'string' ?
         _list.getProject(project).setTask(task) :
         _list.getProject(project.getName()).setTask(task);
+        _list.update_dates(task)
         this.saveList(_list);
     },
 
@@ -85,19 +86,21 @@ const storage = {
     update_task_date (project, task, date) {
         const _list = this.getList();
         _list.getProject(project).getTask(task).setDueDate(date)
+        const new_task =  _list.getProject(project).getTask(task)
+        _list.update_dates(new_task)
+        _list.check_dates()
         this.saveList(_list)
     },
 
-    update_timed_projects () {
+    update_status (task) {
         const _list = this.getList();
-        _list.update_today()
-        _list.update_week()
+        _list.update_status(task)
         this.saveList(_list)
     },
 
-    update_current (current_project) {
+    update_current (project) {
         const _list = this.getList();
-        _list.setCurrent(current_project)
+        _list.setCurrent(project)
         this.saveList(_list)
     }
 
