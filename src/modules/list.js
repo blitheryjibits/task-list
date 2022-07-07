@@ -1,4 +1,4 @@
-import { format, parseISO, isSameWeek } from 'date-fns';
+import { format, parseISO, isSameWeek, isSameMonth, compareAsc } from 'date-fns';
 
 
 const List_proto = {
@@ -39,40 +39,83 @@ const List_proto = {
 
     deleteProjects () { for (let i = this.projects.length-1; i >= 0; i--) this.projects.pop() },
 
-
-    // Create new Date, get all projects and for each, 
-    // check today date and this week (mon -> sun) and month (1 -> last day)
-    // if in date, make copy and add to today and/or week projects and/or month
-    // use storage interface to save list in local storage
-    update_today () {
-        const today = this.getProject('Today')
+// Adds new tasks to the daily, weekly, and monthly project lists
+    update_dates (new_task) {
         const list = this.getProjects()
-        const date = format(new Date(), 'yyyy-MM-dd')
-        list.forEach(project => {
+        const dates = [ this.getProject('Today'), this.getProject('This Week'), this.getProject('This Month') ]
+        const overdue = this.getProject('Overdue')
+        const projects = list.filter(project => project !== dates[0] && project !== dates[1] && project !== dates[2] && project !== overdue)
+        const new_task_name = new_task.getName()
+        const today = format(new Date(), 'yyyy-MM-dd')
+        let found;
+
+        projects.forEach(project => {
             const tasks = project.getTasks()
             tasks.forEach(task => {
-                if (task.getFormattedDate() === date) {
-                    today.replaceTask(task)
+                const task_date = task.getFormattedDate()
+                if (task_date === today) dates[0].replaceTask(task)
+                if (isSameWeek(parseISO(task_date), parseISO(today), {weekStartsOn: 1})) dates[1].replaceTask(task)
+                if (isSameMonth(parseISO(task_date), parseISO(today))) dates[2].replaceTask(task)
+            })    
+        })
+    // Propogates changes to task dates through default (timed) projects
+        dates.forEach(project => {
+            found = project.getTasks().find(task => task.getName() === new_task_name) 
+            found? project.replaceTask(new_task) : project.setTask(new_task);
+        })
+        return list
+    },
+
+// Adds any projects from the daily, weekly, and monthly projects to the overdue list when passed due date 
+    check_dates () {
+        const list = this.getProjects()
+        const today = format(new Date(), 'yyyy-MM-dd')
+        const dates = [ this.getProject('Today'), this.getProject('This Week'), this.getProject('This Month'), this.getProject('Overdue') ]
+        
+        dates.forEach(project => {
+            const project_name = project.getName()
+            const tasks = project.getTasks()
+            tasks.forEach(task => {
+                const task_date = task.getFormattedDate()
+        // check today
+                if (project_name === 'Today' 
+                && task_date !== today) {
+                    dates[3].replaceTask(task)
+                    dates[0].deleteTask(task)
+                }
+        // check week
+                if (project_name === 'This Week' 
+                && !isSameWeek(parseISO(task_date), parseISO(today), {weekStartsOn: 1})) {
+                    dates[3].replaceTask(task)
+                    dates[1].deleteTask(task)
+                }
+        // check month
+                if (project_name === 'This Month' 
+                && !isSameMonth(parseISO(task_date), parseISO(today))) {
+                    overdue.replaceTask(task)
+                    dates[0].deleteTask(task)
+                }
+        // check overdue
+                if (project_name === 'Overdue' 
+                && task_date > today) {
+                    dates[3].deleteTask(task)
                 }
             })
         })
-        return today
+        return list
     },
-    update_week () {
-        const week = this.getProject('This Week')
-        const list = this.getProjects()
-        const date = format(new Date(), 'yyyy-MM-dd')
-        list.forEach(project => {
-            const tasks = project.getTasks()
-            tasks.forEach(task => {
-                if (isSameWeek(parseISO(task.getFormattedDate()), parseISO(date), {weekStartsOn: 1})) 
-                    week.replaceTask(task)
-            })
-        })
-        return week
-    }
-}
 
+    update_status(task) {
+        const list = this.getProjects()
+        const task_name = typeof task === 'string' ? task : task.getName()
+        let found;
+        list.forEach(project => {
+            project.getTasks().find(_task => _task.getName() === task_name)?.setStatus()
+            })
+        return list
+    }
+
+}
 
 
 const CreateList = () => {
