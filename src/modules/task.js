@@ -12,6 +12,12 @@ const Task_proto = {
     getFormattedDate() {
         return format(parseISO(this.dueDate), 'yyyy-MM-dd');
     },
+
+    setDescription(details) {this.description = details},
+    getDescription() {return this.description},
+
+    setPriority(priority_level) {this.priority = priority_level},
+    getPriority() {return this.priority}
 }
 
 const CreateTask = (name, date) => {
@@ -30,6 +36,14 @@ const CreateTask = (name, date) => {
             value: date || new Date(), 
             enumerable:true,
             writable:true
+        },
+        description: {
+            value: '',
+            enumerable: true,
+            writable: true
+        },
+        priority: {
+            value: ''
         }
     });
 }
