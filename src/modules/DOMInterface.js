@@ -4,15 +4,19 @@ import { storage } from "./storage";
 import { format } from 'date-fns';
 
 //  ToDo
-//  - Display current project name at top of task box
+//  - Add function to display all projects
+
+//  - Add description and priority to tasks
+
 //  - remove ridiculous projects and task, 
 //      - replace with reasonable task and project
+//
 //  - finish styling with CSS
 //      - add any interactive motion
-//  - Attempt to refactor code
 //
-//  - Add remove/delete buttons for projects and tasks
-//  - determine storage and placement of finished
+//  - Attempt to refactor code
+
+//  - determine storage and placement of finished tasks
 //  - Convert default projects to dropdown menu that displays the projects when selected
 //      - Remove listeners and add button when in displaying default projects
  
@@ -26,20 +30,16 @@ const UI = {
         UI.load_projects();
         UI.init_add_task_button();
         UI.init_add_project_button();
-        let _list = storage.getList();
-        _list.setCurrent(_list.getProject('Today'))
-        storage.saveList(_list)
+        storage.update_current(storage.getList().getProject('Today'))
     },
     
     find_current_project () {
         return storage.getList().getCurrent()
     },
 
-
     load_projects() {
         const list = storage.getList().getProjects();
         UI.init_projects(list)
-        UI.init_project_buttons()
     },
     
     load_default_projects () {
@@ -56,13 +56,13 @@ const UI = {
     },
 
    init_default_projects(list) {
-        const default_projects_container = document.querySelector('.task_by_date')
+        const default_projects_container = document.querySelector('.task-divider .drop-content')
         list.forEach(project => {
-            const name = project.getName()
-            const button = document.createElement('button')
-            button.classList.add('button', 'project')
-            button.textContent = `${name}`
-            default_projects_container.appendChild(button)
+            const a = document.createElement('a')
+            a.classList.add('defaut-project')
+            a.textContent = `${project.getName()}`
+            a.addEventListener('click', UI.load_tasks, false)
+            default_projects_container.appendChild(a)
        });
     },
 
@@ -76,10 +76,19 @@ const UI = {
         list.forEach(project => {
             let name = project.getName();
             if (name !== 'Today' && name !== 'This Week' && name !== 'This Month' && name !== 'Overdue') {
-                const button = document.createElement('button')
-                button.classList.add('button', 'project')
-                button.textContent = `${name}`
-                projects_container.insertBefore(button, add_project)
+                const project_box = document.createElement('div') 
+                    project_box.classList.add('project_box')
+
+                const name_container = document.createElement('div')
+                    name_container.classList.add('button', 'project')
+                    name_container.textContent = `${name}`
+                    name_container.addEventListener('click', this.load_tasks, false)
+                const remove = document.createElement('span')
+                    remove.classList.add('material-symbols-outlined')
+                    remove.textContent = 'delete'
+                    remove.addEventListener('click', UI.remove_project, false)
+                project_box.append(name_container, remove)
+                projects_container.insertBefore(project_box, add_project)
             }
         });
     },
@@ -105,18 +114,8 @@ const UI = {
     load_tasks (e) {
         const list = storage.getList()
         const project = list.getProject(e.target.innerText)
-        list.setCurrent(project)
-        const tasks = project.getTasks()
-        UI.clear_tasks()
-        UI.create_task_preview(tasks)
-        storage.saveList(list)
-    },
-    
-    init_project_buttons () {
-        const buttons = document.querySelectorAll('button.project')
-        buttons.forEach(button => {
-            button.addEventListener('click', this.load_tasks, false)
-        })
+        storage.update_current(project)
+        UI.create_task_preview(project)
     },
 
     init_add_task_button () {
@@ -126,16 +125,20 @@ const UI = {
 
     init_add_project_button() {
         const add_project = document.querySelector(`.projects > .add-project`)
-        add_project.addEventListener('click', UI.add_new_project, false)
-    },
-
-    add_new_project() {
-        UI.create_project_form()
+        add_project.addEventListener('click', UI.create_project_form, false)
     },
 
 // Create elements for each task and add to DOM for display //
-    create_task_preview (tasks) {
-        const task_preview = document.querySelector('.task__box')
+    create_task_preview (project) {
+        UI.clear_tasks()
+        const task_preview = document.querySelector('.task__box');
+        const add_task = document.querySelector('.add-task')
+        const add_project = document.querySelector('.add-project')
+        const project_title = document.createElement('div')
+            project_title.classList.add('project_title')
+            project_title.innerText = project.getName()
+        task_preview.append(project_title)
+        const tasks = project.getTasks()
         tasks.forEach(task => {
             const task_box = document.createElement('div')
                 task_box.classList.add('task')
@@ -150,15 +153,20 @@ const UI = {
                 check_box.classList.add('checkbox__box')
                 checkbox_input.checked = task.getStatus()
         // Date elements //
-            const date = UI.create_date_element(task.getFormattedDate());
+            const date = UI.create_date_element(task.getFormattedDate())
+        
+        // Create delete task button //
+            const remove = UI.create_remove_button()
         
         // Insert Task elements in to DOM //
             date.lastChild.addEventListener('change', UI.update_date, false)
-            checkbox_input.addEventListener('change', this.update_status, false)
+            checkbox_input.addEventListener('change', UI.update_status, false)
             task_label.append(checkbox_input, check_box, text)
-            task_box.append(task_label, date)
+            task_box.append(task_label, date, remove)
             task_preview.append(task_box)
         })
+        if (add_task.classList.contains('hide')) add_task.classList.remove('hide')
+        if (add_project.classList.contains('hide')) add_project.classList.remove('hide')
     },
 
     clear_tasks () {
@@ -182,6 +190,17 @@ const UI = {
         return date_label
     },
 
+    create_remove_button () {
+        const remove = document.createElement('div')
+        remove.classList.add('remove_task')
+        const bin = document.createElement('span')
+            bin.classList.add('material-symbols-outlined')
+            bin.textContent = 'delete'
+            bin.addEventListener('click', this.remove_task, false)
+        remove.append(bin)
+        return remove
+    },
+
     create_partial_form () {
         const div = document.createElement('div')
             div.classList.add('div-form')
@@ -192,9 +211,11 @@ const UI = {
             input.setAttribute('type', 'text')
         const submit_button = document.createElement('button')
             submit_button.setAttribute('type', 'submit')
+            submit_button.classList.add('submit')
             submit_button.textContent = `Submit`
         const cancel_button = document.createElement('button')
             cancel_button.setAttribute('type', 'reset')
+            cancel_button.classList.add('cancel')
             cancel_button.textContent = `Cancel`
         
         label.append(input)
@@ -205,9 +226,11 @@ const UI = {
 
 // Project form is for adding new projects to storage //
     create_project_form () {
+        document.querySelector('.add-project.submit').classList.add('hide')
+        document.querySelector('button.add-task').classList.add('hide')
         const task_box = document.querySelector('.task__box')
         const div = UI.create_partial_form()
-    // Display form //   
+// Display form //   
         UI.clear_tasks();
         task_box.append(div)
         const form = document.querySelector('.submit-form')
@@ -220,14 +243,15 @@ const UI = {
     create_task_form () {
         const div = UI.create_partial_form()
         const form = div.querySelector('.submit-form')
-        const button = div.querySelector('.submit-form > button')
+        const submit_button = div.querySelector('.submit-form > button')
         const task_box = document.querySelector('.task__box')
+        document.querySelector('button.add-task').classList.add('hide')
        
     // Date elements //
         const date = UI.create_date_element(format(Date.now(), 'yyyy-MM-dd'));
 
     // Display form //    
-        form.insertBefore(date, button)
+        form.insertBefore(date, submit_button)
         form.addEventListener('submit', UI.log_submit)
         form.addEventListener('reset', UI.remove_form)
         div.append(form)
@@ -235,7 +259,7 @@ const UI = {
     },
 
     log_submit (e) {
-        // Create new task and add to current project
+    // Create new task and add to current project
         const task_name = e.target[0].value
         const task_date = e.target[1].value
         const new_task = CreateTask(task_name)
@@ -244,13 +268,14 @@ const UI = {
         storage.addTask(project, new_task)
         storage.update_task_date(project, task_name, task_date) 
         UI.remove_form()
-        UI.clear_tasks()
-        UI.create_task_preview(storage.getProject(project).getTasks())
+        UI.create_task_preview(storage.getProject(project))
+        document.querySelector('button.add-task').classList.remove('hide')
         e.preventDefault()
     },
     
     log_project_submit (e) {
-        // Create new project and set to current project
+    // Create new project and set to current project
+        document.querySelector('.add-project.submit').classList.add('hide')
         const project_name = e.target[0].value
         const new_project = CreateProject(project_name)
         storage.addProject(new_project)
@@ -264,6 +289,8 @@ const UI = {
     remove_form () {
         const task_box = document.querySelector('.task__box')
         task_box.removeChild(document.querySelector('.div-form'))
+        document.querySelector('button.add-task').classList.remove('hide')
+        document.querySelector('.add-project.submit').classList.remove('hide')
     },
 
     update_date (e) {
@@ -272,15 +299,27 @@ const UI = {
         const project = storage.getList().getCurrent()
         const task = project.getTask(name)
         storage.update_task_date(project, task, date)
+        UI.create_task_preview(storage.getProject(project))
     },
 
     update_status (e) {
         const task = e.target.parentNode.innerText
-        // const project = storage.getList().getCurrent()
-        // const task = project.getTask(name)
         storage.update_status(task)
-    }
+    },
 
+    remove_project (e) {
+        console.log(e.target.parentNode.children[0].innerText)
+        const project_name = e.target.parentNode.children[0].innerText
+        storage.deleteProject(project_name)
+        UI.load_projects()
+    },
+
+    remove_task (e) {
+        const task_name = e.target.parentNode.parentNode.children[0].innerText
+        const project = storage.getList().getCurrent()
+        storage.deleteTask(task_name)
+        UI.create_task_preview(storage.getProject(project))
+    }
 }
 
 export { UI }
