@@ -92,8 +92,8 @@ const List_proto = {
         // check month
                 if (project_name === 'This Month' 
                 && !isSameMonth(parseISO(task_date), parseISO(today))) {
-                    overdue.replaceTask(task)
-                    dates[0].deleteTask(task)
+                    dates[3].replaceTask(task)
+                    dates[2].deleteTask(task)
                 }
         // check overdue
                 if (project_name === 'Overdue' 
