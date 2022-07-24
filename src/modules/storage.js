@@ -44,8 +44,8 @@ const storage = {
     },
 
     deleteProject (project) {
-        const _list = this.getList();
-        _list.deleteProject(project.getName());
+        const _list = this.getList(); 
+        _list.deleteProject(typeof project === 'string' ? project : project.getName());
         this.saveList(_list);
     },
 
@@ -67,13 +67,16 @@ const storage = {
 
     getTask (project, task) {
         const _list = this.getList();
-        return _list.getProject(project === typeof 'string'?project: project.getName())
+        return _list.getProject(project === typeof 'string'? project : project.getName())
         .getTask(task)
     },
 
-    deleteTask (project, task) {
+    deleteTask (task) {
         const _list = this.getList();
-        _list.getProject(project).deleteTask(task);
+        _list.getProjects().forEach(_project => {
+            let _task = _project.getTasks().find(_task => _task.getName() === task)
+            _project.deleteTask(task)
+        })
         this.saveList(_list);
     },
 
