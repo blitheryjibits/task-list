@@ -1,17 +1,14 @@
 import { format } from 'date-fns';
-import parseISO from 'date-fns/parseISO'
 
 const Task_proto = {
     getName() { return this.name; },
     setName(newName) { return this.name = newName; },
 
-    setStatus() { this.status? this.status = false : this.status = true; }, // true if task is completed
+    setStatus() { this.status? this.status = false : this.status = true; },
     getStatus() { return this.status; },
     
     setDueDate(date) { typeof date === 'Date' ? this.dueDate = format(date, 'yyyy-MM-dd') : this.dueDate = date},
-    getFormattedDate() { console.log(this.dueDate); 
-        return (this.dueDate);
-    },
+    getFormattedDate() { return (this.dueDate); },
 
     setDescription(details) {this.description = details},
     getDescription() {return this.description},
