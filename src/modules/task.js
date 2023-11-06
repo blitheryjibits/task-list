@@ -8,9 +8,9 @@ const Task_proto = {
     setStatus() { this.status? this.status = false : this.status = true; }, // true if task is completed
     getStatus() { return this.status; },
     
-    setDueDate(date) { this.dueDate = date},
-    getFormattedDate() {
-        return format(parseISO(this.dueDate), 'yyyy-MM-dd');
+    setDueDate(date) { typeof date === 'Date' ? this.dueDate = format(date, 'yyyy-MM-dd') : this.dueDate = date},
+    getFormattedDate() { console.log(this.dueDate); 
+        return (this.dueDate);
     },
 
     setDescription(details) {this.description = details},
@@ -33,7 +33,7 @@ const CreateTask = (name, date) => {
             writable:true
         },
         dueDate: {
-            value: date || new Date(), 
+            value: date || format(new Date(), 'yyyy-MM-dd'), 
             enumerable:true,
             writable:true
         },
