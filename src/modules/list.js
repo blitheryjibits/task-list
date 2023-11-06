@@ -32,12 +32,10 @@ const List_proto = {
     },
     
     deleteProject  (projectName) { 
-        let tempArray = this.projects.filter((project) => project.getName() !== projectName);
-        for (let i = this.projects.length-1; i >= 0; i--) this.projects.pop();
-        tempArray.forEach(project => this.projects.push(project));
+        this.projects = this.projects.filter(project => project.getName() !== projectName);
     },
 
-    deleteProjects () { for (let i = this.projects.length-1; i >= 0; i--) this.projects.pop() },
+    deleteProjects () { this.projects = [] },
 
 // Adds new tasks to the daily, weekly, and monthly project lists
     update_dates (new_task) {
