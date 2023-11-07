@@ -12,32 +12,39 @@ const Project_proto = {
 
     setTask (newTask) {
         const name = typeof newTask === 'string' ? newTask : newTask.getName() 
-        if (this.tasks.find((task) => task.getName() === name ))
+        if (this.tasks.find((task) => task.getName() === name )) {
             (window.confirm(`You are about to overwrite ${name}.
             Would you like to proceed?`)) ? this.replaceTask(newTask) : alert('task not saved') ;
-        // else
-        this.tasks.push(newTask)
-    },
-
-    setTasks (tasks) { tasks.forEach(task => this.tasks.push(task)) },
-
-    deleteTask (task) {
-        const name = typeof task === 'string' ? task : task.getName() 
-        const tempTasks = this.tasks.filter((_task) => _task.getName() !== name)
-        for (let i = this.tasks.length-1;  i >= 0;  i--)  this.tasks.pop()
-        tempTasks.forEach((_task) => this.tasks.push(_task)) 
-    },
-
-    deleteTasks () { for (let i = this.tasks.length-1; i >= 0; i--) this.tasks.pop() },
-
-    replaceTask (newTask) {
-        const name = typeof newTask === 'string' ? newTask : newTask.getName()
-        if (this.tasks.find((task) => task.getName() === name )) {
-            let index = this.tasks.findIndex( element => {
-            if (element.name === name) return true });
-            this.tasks.splice(index,1,newTask)
         } else {
             this.tasks.push(newTask)
+        }
+    },
+
+    setTasks (tasks) { tasks.forEach(task => {
+        if (this.tasks.includes(task) === false ) {this.tasks.push(task)}
+        else this.replaceTask(task);
+    } 
+    )},
+
+    deleteTask (task) {
+        const name = typeof task === 'string' ? task : task.getName();
+        const taskIndex = this.tasks.findIndex((task) => task.getName() === name);
+        if (taskIndex !== -1) { this.tasks.splice(taskIndex, 1); }
+    },
+
+    deleteTasks () { this.tasks = [] },
+
+    
+    replaceTask (newTask) {
+        const name = typeof newTask === 'string' ? newTask : newTask.getName()
+        const existingTaskIndex = this.tasks.findIndex((task) => task.getName() === name);
+
+        if (existingTaskIndex !== -1) {
+            // Replace the existing task with the new task
+            this.tasks.splice(existingTaskIndex, 1, newTask);
+        } else {
+            // Add the new task if it doesn't exist
+            this.tasks.push(newTask);
         }
     },
 

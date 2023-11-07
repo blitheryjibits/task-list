@@ -23,14 +23,15 @@ import { format } from 'date-fns';
 const UI = {
 
     loadPage () {
-        localStorage.clear();
+        // localStorage.clear();
         UI.load_default_projects();
-        UI.create_temp_projects();
-        UI.create_temp_tasks();
+        // UI.create_temp_projects();
+        // UI.create_temp_tasks();
         UI.load_projects();
         UI.init_add_task_button();
         UI.init_add_project_button();
         storage.update_current(storage.getList().getProject('Today'))
+        UI.create_task_preview(storage.getList().getCurrent())
     },
     
     find_current_project () {
@@ -94,20 +95,20 @@ const UI = {
     },
 
 // Temporary projects for content on start up //
-    create_temp_projects () {
-        storage.addProject(CreateProject('temp proj 1'))
-        storage.addProject(CreateProject('temp proj 2'))
-    },
+    // create_temp_projects () {
+    //     storage.addProject(CreateProject('House Cleaning'))
+    //     storage.addProject(CreateProject('Car Maintenance'))
+    // },
 
-    create_temp_tasks () {
-        UI.create_temp_task('Today', 'first task')
-        UI.create_temp_task('Today', 'second task')
-        UI.create_temp_task('Today', 'third task')
-    },
+    // create_temp_tasks () {
+    //     UI.create_temp_task('House Cleaning', 'sweep')
+    //     UI.create_temp_task('Car Maintenance', 'change oil')
+    //     UI.create_temp_task('Car Maintenance', 'replace struts')
+    // },
 
-    create_temp_task (project, taskName) {
-        storage.addTask(project, CreateTask(taskName))
-    },
+    // create_temp_task (project, taskName) {
+    //     storage.addTask(project, CreateTask(taskName))
+    // },
 //////////////////////////////////////////////
   
 // Logic for loading tasks when a project button is clicked in the API //
