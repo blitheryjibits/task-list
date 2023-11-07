@@ -10,8 +10,11 @@ import { format } from 'date-fns';
 //
 //  - finish styling with CSS
 //      - add any interactive motion
+//      - imrpove layout design
 //
-//  - Attempt to refactor code
+//  - Fix cross project task naming conflicts. same name tasks shouldn't be able to 
+//  change status of other tasks in other projects with the same name.
+//  The main issue will be in default date projects... probably.
 
  
 const UI = {
