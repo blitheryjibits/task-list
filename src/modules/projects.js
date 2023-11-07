@@ -1,8 +1,8 @@
 
 const Project_proto = {
-    getName () { return this.name },
+    getName () { return this.project },
 
-    setName (newName) { return this.name = newName },
+    setName (newProject) { return this.project = newProject },
     
     getTasks () { return this.tasks },
 
@@ -45,10 +45,10 @@ const Project_proto = {
     getCurrent () { return this.current }
 }
 
-const CreateProject = (name) => {
+const CreateProject = (project) => {
     return Object.create(Project_proto, {
-        name: { 
-            value: name, 
+        project: { 
+            value: project, 
             enumerable:true,
             writable: true
         },

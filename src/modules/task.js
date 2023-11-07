@@ -1,8 +1,8 @@
 import { format } from 'date-fns';
 
 const Task_proto = {
-    getName() { return this.name; },
-    setName(newName) { return this.name = newName; },
+    getName() { return this.task; },
+    setName(newTask) { return this.task = newTask; },
 
     setStatus() { this.status? this.status = false : this.status = true; },
     getStatus() { return this.status; },
@@ -17,10 +17,10 @@ const Task_proto = {
     getPriority() {return this.priority}
 }
 
-const CreateTask = (name, date) => {
+const CreateTask = (task, date) => {
     return Object.create(Task_proto, {
-        name: { 
-            value: name, 
+        task: { 
+            value: task, 
             enumerable:true,
             writable:true
         },
