@@ -7,26 +7,20 @@ import { format } from 'date-fns';
 //  - Add function to display all projects
 
 //  - Add description and priority to tasks
-
-//  - remove ridiculous projects and task, 
-//      - replace with reasonable task and project
 //
 //  - finish styling with CSS
 //      - add any interactive motion
 //
 //  - Attempt to refactor code
 
-//  - determine storage and placement of finished tasks
-//  - Convert default projects to dropdown menu that displays the projects when selected
-//      - Remove listeners and add button when in displaying default projects
  
 const UI = {
 
     loadPage () {
         // localStorage.clear();
         UI.load_default_projects();
-        // UI.create_temp_projects();
-        // UI.create_temp_tasks();
+        UI.create_temp_projects();
+        UI.create_temp_tasks();
         UI.load_projects();
         UI.init_add_task_button();
         UI.init_add_project_button();
@@ -95,20 +89,20 @@ const UI = {
     },
 
 // Temporary projects for content on start up //
-    // create_temp_projects () {
-    //     storage.addProject(CreateProject('House Cleaning'))
-    //     storage.addProject(CreateProject('Car Maintenance'))
-    // },
+    create_temp_projects () {
+        storage.addProject(CreateProject('House Cleaning'))
+        storage.addProject(CreateProject('Car Maintenance'))
+    },
 
-    // create_temp_tasks () {
-    //     UI.create_temp_task('House Cleaning', 'sweep')
-    //     UI.create_temp_task('Car Maintenance', 'change oil')
-    //     UI.create_temp_task('Car Maintenance', 'replace struts')
-    // },
+    create_temp_tasks () {
+        UI.create_temp_task('House Cleaning', 'sweep')
+        UI.create_temp_task('Car Maintenance', 'change oil')
+        UI.create_temp_task('Car Maintenance', 'replace struts')
+    },
 
-    // create_temp_task (project, taskName) {
-    //     storage.addTask(project, CreateTask(taskName))
-    // },
+    create_temp_task (project, taskName) {
+        storage.addTask(project, CreateTask(taskName))
+    },
 //////////////////////////////////////////////
   
 // Logic for loading tasks when a project button is clicked in the API //

@@ -13,8 +13,7 @@ const Project_proto = {
     setTask (newTask) {
         const name = typeof newTask === 'string' ? newTask : newTask.getName() 
         if (this.tasks.find((task) => task.getName() === name )) {
-            (window.confirm(`You are about to overwrite ${name}.
-            Would you like to proceed?`)) ? this.replaceTask(newTask) : alert('task not saved') ;
+            this.replaceTask(newTask) 
         } else {
             this.tasks.push(newTask)
         }
