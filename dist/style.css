@@ -205,6 +205,7 @@ main {
     margin: 0 10%;
 }
 
+
 .submit-form>.task-date {
     width: 20%;
     line-height: 1.4rem;
@@ -300,6 +301,28 @@ main {
 .button.add-project {
     margin: 0.8rem 0 0 0;
 }
+
+/* Add project button */
+.add-button-div {
+    display: flex;
+    padding: 3px;
+    justify-content : end;
+}
+.add-project  {
+    border-radius: 50%;
+    height: 25px;
+    width: 25px;
+    font-size: large;
+    color: black;
+    transition: transform 1s ease-in;
+    transform: rotate(0deg)  
+}   
+.add-project:hover {
+    transform: rotate(90deg);
+    color: rgb(84, 226, 84);
+    transition: all 0.8s ease-in;
+}
+/*  */
 
 .cancel {
     background-color: var(--button-secondary);
