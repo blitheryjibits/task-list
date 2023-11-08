@@ -67,10 +67,14 @@ const UI = {
 // Displays loaded projects as buttons in API - called in load_projects//
     init_projects(list) {
         const projects_container = document.querySelector('.projects')
+        const add_project = document.querySelector(`.add-button-div`)
+        // console.log("project container add project button: " + add_project.innerHTML)
+        // removes all projects from DOM to avoid repetition
+        // doesn't remove the add project button
         while (projects_container.children.length > 1) {
             projects_container.removeChild(projects_container.firstChild)
         }
-        const add_project = document.querySelector(`.projects > .add-project`)
+
         list.forEach(project => {
             let name = project.getName();
             if (name !== 'Today' && name !== 'This Week' && name !== 'This Month' && name !== 'Overdue') {
@@ -88,6 +92,7 @@ const UI = {
                 project_box.append(name_container, remove)
                 projects_container.insertBefore(project_box, add_project)
             }
+            
         });
     },
 
@@ -122,7 +127,7 @@ const UI = {
     },
 
     init_add_project_button() {
-        const add_project = document.querySelector(`.projects > .add-project`)
+        const add_project = document.querySelector(`.add-project`)
         add_project.addEventListener('click', UI.create_project_form, false)
     },
 
@@ -167,6 +172,7 @@ const UI = {
         if (add_project.classList.contains('hide')) add_project.classList.remove('hide')
     },
 
+    // change task preview to innerhtml = ''
     clear_tasks () {
         const task_preview = document.querySelector('.task__box')
         while (task_preview.firstChild) {
