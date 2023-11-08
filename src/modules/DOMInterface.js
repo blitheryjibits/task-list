@@ -283,7 +283,7 @@ const UI = {
         storage.update_current(new_project)
         UI.remove_form()
         UI.load_projects()
-        // create task view
+        UI.create_task_preview(new_project)
         e.preventDefault()
     },
 
