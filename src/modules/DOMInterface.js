@@ -122,12 +122,12 @@ const UI = {
     },
 
     init_add_task_button () {
-        const button = document.querySelector('button.add-task')
+        const button = document.querySelector('.add-task-button')
         button.addEventListener('click', UI.create_task_form, false)
     },
 
     init_add_project_button() {
-        const add_project = document.querySelector(`.add-project`)
+        const add_project = document.querySelector(`.add-project-button`)
         add_project.addEventListener('click', UI.create_project_form, false)
     },
 
@@ -135,8 +135,8 @@ const UI = {
     create_task_preview (project) {
         UI.clear_tasks()
         const task_preview = document.querySelector('.task__box');
-        const add_task = document.querySelector('.add-task')
-        const add_project = document.querySelector('.add-project')
+        const add_task = document.querySelector('.add-task-button')
+        const add_project = document.querySelector('.add-project-button')
         const project_title = document.createElement('div')
             project_title.classList.add('project_title')
             project_title.innerText = project.getName()
@@ -175,9 +175,7 @@ const UI = {
     // change task preview to innerhtml = ''
     clear_tasks () {
         const task_preview = document.querySelector('.task__box')
-        while (task_preview.firstChild) {
-            task_preview.removeChild(task_preview.firstChild)
-        }
+        task_preview.innerHTML = ''
     },
 
     create_date_element (date) {
@@ -230,8 +228,8 @@ const UI = {
 
 // Project form is for adding new projects to storage //
     create_project_form () {
-        document.querySelector('.add-project.submit').classList.add('hide')
-        document.querySelector('button.add-task').classList.add('hide')
+        document.querySelector('.add-project-button').classList.add('hide')
+        document.querySelector('.add-task-button').classList.add('hide')
         const task_box = document.querySelector('.task__box')
         const div = UI.create_partial_form()
 // Display form //   
@@ -249,7 +247,7 @@ const UI = {
         const form = div.querySelector('.submit-form')
         const submit_button = div.querySelector('.submit-form > button')
         const task_box = document.querySelector('.task__box')
-        document.querySelector('button.add-task').classList.add('hide')
+        document.querySelector('.add-task-button').classList.add('hide')
        
     // Date elements //
         const date = UI.create_date_element(format(Date.now(), 'yyyy-MM-dd'));
@@ -273,28 +271,27 @@ const UI = {
         storage.update_task_date(project, task_name, task_date) 
         UI.remove_form()
         UI.create_task_preview(storage.getProject(project))
-        document.querySelector('button.add-task').classList.remove('hide')
+        document.querySelector('.add-task-button').classList.remove('hide')
         e.preventDefault()
     },
     
     log_project_submit (e) {
     // Create new project and set to current project
-        document.querySelector('.add-project.submit').classList.add('hide')
         const project_name = e.target[0].value
         const new_project = CreateProject(project_name)
         storage.addProject(new_project)
         storage.update_current(new_project)
         UI.remove_form()
-        UI.clear_tasks()
         UI.load_projects()
+        // create task view
         e.preventDefault()
     },
 
     remove_form () {
         const task_box = document.querySelector('.task__box')
         task_box.removeChild(document.querySelector('.div-form'))
-        document.querySelector('button.add-task').classList.remove('hide')
-        document.querySelector('.add-project.submit').classList.remove('hide')
+        document.querySelector('.add-task-button').classList.remove('hide')
+        document.querySelector('.add-project-button').classList.remove('hide')
     },
 
     update_date (e) {
