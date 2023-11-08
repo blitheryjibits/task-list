@@ -4,23 +4,18 @@ import { storage } from "./storage";
 import { format } from 'date-fns';
 
 //  ToDo
-//  - Add function to display all projects
-
 //  - Add description and priority to tasks
-//
-//  - finish styling with CSS
-//      - add any interactive motion
-//      - imrpove layout design
 //
 //  - Fix cross project task naming conflicts. same name tasks shouldn't be able to 
 //  change status of other tasks in other projects with the same name.
-//  The main issue will be in default date projects... probably.
+//  The main issue will be in default date projects like 'Today'.
 
  
 const UI = {
 
+    // loads all projects from storage and initializes the list of tasks
+    // from Today project as default
     loadPage () {
-        // localStorage.clear();
         UI.load_default_projects();
         UI.create_temp_projects();
         UI.create_temp_tasks();
@@ -56,11 +51,14 @@ const UI = {
    init_default_projects(list) {
         const default_projects_container = document.querySelector('.task-divider .drop-content')
         list.forEach(project => {
+            let name = project.getName();
+            if (name == 'Today' || name == 'This Week' || name == 'This Month' || name == 'Overdue') {
             const a = document.createElement('a')
             a.classList.add('defaut-project')
             a.textContent = `${project.getName()}`
             a.addEventListener('click', UI.load_tasks, false)
             default_projects_container.appendChild(a)
+            }
        });
     },
 
@@ -68,13 +66,13 @@ const UI = {
     init_projects(list) {
         const projects_container = document.querySelector('.projects')
         const add_project = document.querySelector(`.add-button-div`)
-        // console.log("project container add project button: " + add_project.innerHTML)
+        
         // removes all projects from DOM to avoid repetition
         // doesn't remove the add project button
         while (projects_container.children.length > 1) {
             projects_container.removeChild(projects_container.firstChild)
         }
-
+        // adds all projects to the project 'left nav bar' that are not the default projects
         list.forEach(project => {
             let name = project.getName();
             if (name !== 'Today' && name !== 'This Week' && name !== 'This Month' && name !== 'Overdue') {
