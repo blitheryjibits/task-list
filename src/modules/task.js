@@ -14,7 +14,9 @@ const Task_proto = {
     getDescription() {return this.description},
 
     setPriority(priority_level) {this.priority = priority_level},
-    getPriority() {return this.priority}
+    getPriority() {return this.priority},
+
+    setProject(project_name) { this.project = project_name}
 }
 
 const CreateTask = (task, date) => {
@@ -41,6 +43,11 @@ const CreateTask = (task, date) => {
         },
         priority: {
             value: ''
+        },
+        project: {
+            value: '',
+            enumerable: true,
+            writable: true
         }
     });
 }
