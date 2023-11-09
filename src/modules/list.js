@@ -66,7 +66,6 @@ const List_proto = {
 
 // Adds any projects from the daily, weekly, and monthly projects to the overdue list when passed due date 
     check_dates () {
-        const list = this.getProjects()
         const today = format(new Date(), 'yyyy-MM-dd')
         const dates = [ this.getProject('Today'), this.getProject('This Week'), this.getProject('This Month'), this.getProject('Overdue') ]
         
@@ -100,17 +99,13 @@ const List_proto = {
                 }
             })
         })
-        return list
+        return this
     },
 
-    update_status(task) {
-        const list = this.getProjects()
+    update_status(project, task) {
         const task_name = typeof task === 'string' ? task : task.getName()
-        let found;
-        list.forEach(project => {
-            project.getTasks().find(_task => _task.getName() === task_name)?.setStatus()
-            })
-        return list
+        this.getProject(project).getTasks().find(_task => _task.getName() === task_name)?.setStatus()
+        return this
     }
 
 }

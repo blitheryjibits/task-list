@@ -5,11 +5,11 @@ import { CreateList } from './list';
 const storage = {
 
     saveList (data) { 
-        if (localStorage.getItem('list') !== null) this.deleteList();
+        if (localStorage.getItem('list') !== null) localStorage.removeItem('list');;
         localStorage.setItem('list', JSON.stringify(data)) },
     
     getList () { 
-        if (localStorage.getItem('list') === null) this.saveList(CreateList());
+        if (localStorage.getItem('list') === null) { this.saveList(CreateList()); }
         const _list = Object.assign(CreateList(), JSON.parse(localStorage.getItem('list')));
         
         //Retrieve Projects and change __proto__
@@ -27,9 +27,6 @@ const storage = {
         return _list;
      },
 
-    deleteList () {
-        localStorage.removeItem('list');
-    },
 
     // Functions for accessing Projects in Local Storage //
     addProject (project) { 
@@ -50,8 +47,8 @@ const storage = {
     },
 
     renameProject (project, name) {
-        const _list = this.getList();
-        _list.getProject(project.getName()).setName(name);
+        // const _list = this.getList();
+        this.getProject(project.getName()).setName(name);
         this.saveList(_list);
     },
 
@@ -71,12 +68,13 @@ const storage = {
         .getTask(task)
     },
 
-    deleteTask (task) {
+    deleteTask (project, task) {
         const _list = this.getList();
-        _list.getProjects().forEach(_project => {
-            let _task = _project.getTasks().find(_task => _task.getName() === task)
-            _project.deleteTask(task)
-        })
+        // _list.getProjects().forEach(_project => {
+        //     let _task = _project.getTasks().find(_task => _task.getName() === task)
+            // _project.deleteTask(task)
+        // })
+        _list.getProject(project).deleteTask(task)
         this.saveList(_list);
     },
 
@@ -95,9 +93,9 @@ const storage = {
         this.saveList(_list)
     },
 
-    update_status (task) {
+    update_status (project, task) {
         const _list = this.getList();
-        _list.update_status(task)
+        _list.update_status(project, task)
         this.saveList(_list)
     },
 

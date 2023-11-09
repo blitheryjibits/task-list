@@ -5,10 +5,14 @@ import { format } from 'date-fns';
 
 //  ToDo
 //  - Add description and priority to tasks
-//
+
+//  - Add editing feature for renaming tasks and projects
+
 //  - Fix cross project task naming conflicts. same name tasks shouldn't be able to 
 //  change status of other tasks in other projects with the same name.
 //  The main issue will be in default date projects like 'Today'.
+
+// Create drag and drop feature for reordering tasks and projects
 
  
 const UI = {
@@ -30,9 +34,8 @@ const UI = {
         return storage.getList().getCurrent()
     },
 
-    load_projects() {
-        const list = storage.getList().getProjects();
-        UI.init_projects(list)
+    load_projects() {     
+        UI.init_projects(storage.getList().getProjects())
     },
     
     load_default_projects () {
@@ -303,7 +306,7 @@ const UI = {
 
     update_status (e) {
         const task = e.target.parentNode.innerText
-        storage.update_status(task)
+        storage.update_status(storage.getList().getCurrent(), task)
     },
 
     remove_project (e) {
@@ -316,7 +319,7 @@ const UI = {
     remove_task (e) {
         const task_name = e.target.parentNode.parentNode.children[0].innerText
         const project = storage.getList().getCurrent()
-        storage.deleteTask(task_name)
+        storage.deleteTask(project, task_name)
         UI.create_task_preview(storage.getProject(project))
     }
 }
