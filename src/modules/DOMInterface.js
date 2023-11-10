@@ -6,6 +6,9 @@ import { format } from 'date-fns';
 //  ToDo
 //  - Add description and priority to tasks
 
+//  - create a function that filters by date. Use the default projects button
+//  in the dropdown menu to run it, then use creat task preview function to display.
+
 //  - Add editing feature for renaming tasks and projects
 
 //  - Fix cross project task naming conflicts. same name tasks shouldn't be able to 
@@ -20,14 +23,12 @@ const UI = {
     // loads all projects from storage and initializes the list of tasks
     // from Today project as default
     loadPage () {
-        UI.load_default_projects();
+        UI.init_default_projects();
         UI.create_temp_projects();
         UI.create_temp_tasks();
         UI.load_projects();
         UI.init_add_task_button();
         UI.init_add_project_button();
-        storage.update_current(storage.getList().getProject('Today'))
-        UI.create_task_preview(storage.getList().getCurrent())
     },
     
     find_current_project () {
@@ -37,32 +38,25 @@ const UI = {
     load_projects() {     
         UI.init_projects(storage.getList().getProjects())
     },
-    
-    load_default_projects () {
-        let _list = storage.getList()
-        const list = _list.getProjects();
-        if (list.length == 0) {
-            _list.setProject(CreateProject("Today"))
-            _list.setProject(CreateProject("This Week"))
-            _list.setProject(CreateProject("This Month"))
-            _list.setProject(CreateProject("Overdue"))
-            storage.saveList(_list)
-        }
-        UI.init_default_projects(_list.getProjects())
-    },
 
    init_default_projects(list) {
         const default_projects_container = document.querySelector('.task-divider .drop-content')
-        list.forEach(project => {
-            let name = project.getName();
-            if (name == 'Today' || name == 'This Week' || name == 'This Month' || name == 'Overdue') {
+        const drop_menu_projects = ['Today', 'This Week', 'This Month', 'Overdue']
+        drop_menu_projects.forEach(project => {
             const a = document.createElement('a')
-            a.classList.add('defaut-project')
-            a.textContent = `${project.getName()}`
-            a.addEventListener('click', UI.load_tasks, false)
+            a.textContent = project
+            a.addEventListener('click', UI.filter_dates, false)
             default_projects_container.appendChild(a)
-            }
-       });
+        })
+        default_projects_container.firstElementChild.click();
+    },
+
+    filter_dates(e) {
+        const date = e.target.innerText;
+        const tasks = storage.filter_dates(date);
+        const project = CreateProject(date);
+        project.setTasks(tasks);
+        UI.create_task_preview(project);
     },
 
 // Displays loaded projects as buttons in API - called in load_projects//
@@ -78,7 +72,6 @@ const UI = {
         // adds all projects to the project 'left nav bar' that are not the default projects
         list.forEach(project => {
             let name = project.getName();
-            if (name !== 'Today' && name !== 'This Week' && name !== 'This Month' && name !== 'Overdue') {
                 const project_box = document.createElement('div') 
                     project_box.classList.add('project_box')
 
@@ -94,7 +87,7 @@ const UI = {
                 projects_container.insertBefore(project_box, add_project)
             }
             
-        });
+        );
     },
 
 // Temporary projects for content on start up //
@@ -173,7 +166,6 @@ const UI = {
         if (add_project.classList.contains('hide')) add_project.classList.remove('hide')
     },
 
-    // change task preview to innerhtml = ''
     clear_tasks () {
         const task_preview = document.querySelector('.task__box')
         task_preview.innerHTML = ''
@@ -268,6 +260,7 @@ const UI = {
         const new_task = CreateTask(task_name)
         const project = storage.getList().getCurrent()
         new_task.setDueDate(task_date)
+        new_task.setProject(project.getName())
         storage.addTask(project, new_task)
         storage.update_task_date(project, task_name, task_date) 
         UI.remove_form()

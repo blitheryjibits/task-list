@@ -1,6 +1,7 @@
 import { CreateProject } from "./projects";
 import { CreateTask } from "./task";
 import { CreateList } from './list';
+import { format, addWeeks, addMonths } from 'date-fns';
 
 const storage = {
 
@@ -58,7 +59,7 @@ const storage = {
         typeof project === 'string' ?
         _list.getProject(project).setTask(task) :
         _list.getProject(project.getName()).setTask(task);
-        _list.update_dates(task)
+        // _list.update_dates(task)
         this.saveList(_list);
     },
 
@@ -70,10 +71,6 @@ const storage = {
 
     deleteTask (project, task) {
         const _list = this.getList();
-        // _list.getProjects().forEach(_project => {
-        //     let _task = _project.getTasks().find(_task => _task.getName() === task)
-            // _project.deleteTask(task)
-        // })
         _list.getProject(project).deleteTask(task)
         this.saveList(_list);
     },
@@ -87,8 +84,8 @@ const storage = {
     update_task_date (project, task, date) {
         const _list = this.getList();
         _list.getProject(project).getTask(task).setDueDate(date)
-        const new_task =  _list.getProject(project).getTask(task)
-        _list.update_dates(new_task)
+        // const new_task =  _list.getProject(project).getTask(task)
+        // _list.update_dates(new_task)
         _list.check_dates()
         this.saveList(_list)
     },
@@ -103,6 +100,31 @@ const storage = {
         const _list = this.getList();
         _list.setCurrent(project)
         this.saveList(_list)
+    },
+
+    filter_dates(date) {
+        const today = format(new Date(), 'yyyy-MM-dd')
+        let tasks = []
+        this.getList().getProjects().forEach(project => {
+            switch (date) {
+                case 'Today':
+                    tasks = tasks.concat(project.getTasks().filter(task => task.getFormattedDate() == today))
+                    break;
+                case 'This Week':
+                    tasks = tasks.concat(project.getTasks().filter(task => task.getFormattedDate() < addWeeks(today, 1)))
+                    break;
+                case 'This Month':
+                    tasks = tasks.concat(project.getTasks().filter(task => task.getFormattedDate() < addMonths(today, 1)))
+                    break;
+                case 'Overdue':
+                    tasks = tasks.concat(project.getTasks().filter(task => task.getFormattedDate() < today))
+                    break;
+                default:
+                    tasks = tasks.concat(project.getTasks().filter(task => task.getFormattedDate() === today))
+                    break;
+            }
+        })
+        return tasks;
     }
 
 }
