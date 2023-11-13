@@ -20,7 +20,7 @@ const Project_proto = {
     },
 
     setTasks (tasks) { tasks.forEach(task => {
-        if (this.tasks.includes(task) === false ) {this.tasks.push(task)}
+        if (this.tasks.includes(task) === false ) {this.setTask(task)}
         else this.replaceTask(task);
     } 
     )},

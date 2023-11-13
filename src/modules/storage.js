@@ -3,10 +3,13 @@ import { CreateTask } from "./task";
 import { CreateList } from './list';
 import { format, addWeeks, addMonths } from 'date-fns';
 
+// the storage object acts as a database interface. It utilises functions from the respective
+// modules to reflect changes made to data in storage, making data consistent with 
+// changes made in the User Interface.
 const storage = {
 
     saveList (data) { 
-        if (localStorage.getItem('list') !== null) localStorage.removeItem('list');;
+        if (localStorage.getItem('list') !== null) localStorage.removeItem('list')
         localStorage.setItem('list', JSON.stringify(data)) },
     
     getList () { 
@@ -48,24 +51,24 @@ const storage = {
     },
 
     renameProject (project, name) {
-        // const _list = this.getList();
         this.getProject(project.getName()).setName(name);
         this.saveList(_list);
     },
 
     // Functions for accessing Tasks in Local Storage //
     addTask (project, task) {
+    // this function uses the project related to the task in task.project to ensure that the 
+    // project containing the task is updated when the task is altered in the 
+    // default project view.
+        task.setProject(typeof project === 'string' ? project : project.getName());
         const _list = this.getList();
-        typeof project === 'string' ?
-        _list.getProject(project).setTask(task) :
-        _list.getProject(project.getName()).setTask(task);
-        // _list.update_dates(task)
+        const _project = _list.getProject(project)
+        _project.setTask(task) 
         this.saveList(_list);
     },
 
     getTask (project, task) {
-        const _list = this.getList();
-        return _list.getProject(project === typeof 'string'? project : project.getName())
+        return this.getList().getProject(project === typeof 'string'? project : project.getName())
         .getTask(task)
     },
 
@@ -84,9 +87,6 @@ const storage = {
     update_task_date (project, task, date) {
         const _list = this.getList();
         _list.getProject(project).getTask(task).setDueDate(date)
-        // const new_task =  _list.getProject(project).getTask(task)
-        // _list.update_dates(new_task)
-        _list.check_dates()
         this.saveList(_list)
     },
 
@@ -97,11 +97,24 @@ const storage = {
     },
 
     update_current (project) {
-        const _list = this.getList();
+        let _list = this.getList();
         _list.setCurrent(project)
+        _list = this.update_default(_list)
         this.saveList(_list)
     },
 
+    // removes stale tasks from default project
+    update_default (list) {
+        if (list.getProject('default') !== undefined) {
+            list.getProject('default').deleteTasks()
+        }
+        return list
+    },
+
+    // filters all project tasks by a selected date.
+    // sends filtered tasks back to DOMInterface for display.
+    // also, updates default project with filtered tasks so any changes made in
+    // the filtered view can be reflected in the original project holding the task.
     filter_dates(date) {
         const today = format(new Date(), 'yyyy-MM-dd')
         let tasks = []
@@ -124,6 +137,10 @@ const storage = {
                     break;
             }
         })
+        this.update_current(date);
+        const list = this.getList();
+        list.getProject('default').setTasks(tasks);
+        this.saveList(list)
         return tasks;
     }
 

@@ -6,9 +6,6 @@ import { format } from 'date-fns';
 //  ToDo
 //  - Add description and priority to tasks
 
-//  - create a function that filters by date. Use the default projects button
-//  in the dropdown menu to run it, then use creat task preview function to display.
-
 //  - Add editing feature for renaming tasks and projects
 
 //  - Fix cross project task naming conflicts. same name tasks shouldn't be able to 
@@ -23,9 +20,9 @@ const UI = {
     // loads all projects from storage and initializes the list of tasks
     // from Today project as default
     loadPage () {
-        UI.init_default_projects();
-        UI.create_temp_projects();
-        UI.create_temp_tasks();
+        UI.create_temp_projects();  // placeholder projects
+        UI.create_temp_tasks();     // placeholder tasks
+        UI.init_default_projects(); // projects that show tasks based on timeframe i.e., day, week
         UI.load_projects();
         UI.init_add_task_button();
         UI.init_add_project_button();
@@ -39,7 +36,7 @@ const UI = {
         UI.init_projects(storage.getList().getProjects())
     },
 
-   init_default_projects(list) {
+   init_default_projects() {
         const default_projects_container = document.querySelector('.task-divider .drop-content')
         const drop_menu_projects = ['Today', 'This Week', 'This Month', 'Overdue']
         drop_menu_projects.forEach(project => {
@@ -48,6 +45,8 @@ const UI = {
             a.addEventListener('click', UI.filter_dates, false)
             default_projects_container.appendChild(a)
         })
+        storage.addProject(CreateProject('default'));
+        storage.update_current('default');
         default_projects_container.firstElementChild.click();
     },
 
@@ -71,13 +70,14 @@ const UI = {
         }
         // adds all projects to the project 'left nav bar' that are not the default projects
         list.forEach(project => {
-            let name = project.getName();
+            let project_name = project.getName();
+            if (project_name == 'default') {return}
                 const project_box = document.createElement('div') 
                     project_box.classList.add('project_box')
 
                 const name_container = document.createElement('div')
                     name_container.classList.add('button', 'project')
-                    name_container.textContent = `${name}`
+                    name_container.textContent = `${project_name}`
                     name_container.addEventListener('click', this.load_tasks, false)
                 const remove = document.createElement('span')
                     remove.classList.add('material-symbols-outlined')
@@ -142,6 +142,7 @@ const UI = {
             const task_label = document.createElement('label')
                 task_label.classList.add('checkbox-and-label-container')
             const text = document.createTextNode(`${task.getName()}`)
+       
         // Create checkbox //
             const checkbox_input = document.createElement('input')
                 checkbox_input.classList.add('checkbox__input')
@@ -262,7 +263,7 @@ const UI = {
         new_task.setDueDate(task_date)
         new_task.setProject(project.getName())
         storage.addTask(project, new_task)
-        storage.update_task_date(project, task_name, task_date) 
+        storage.update_task_date(project, task_name, task_date) // remove this line?
         UI.remove_form()
         UI.create_task_preview(storage.getProject(project))
         document.querySelector('.add-task-button').classList.remove('hide')
