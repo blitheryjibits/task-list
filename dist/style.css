@@ -136,10 +136,12 @@ main {
 }
 
 .task {
-    display: flex;
+    display: grid;
+    grid-template-columns: 5% 40% 35% 10%;
+    column-gap: 1%;
     margin: 0 0 1rem 0;
     align-items: center;
-    padding: 0.5rem;
+    padding: 0 0 0 0.2rem;
     border: 1px black solid;
     border-radius: 20px;
     font-family: var(--task-font);
@@ -169,7 +171,7 @@ main {
 .checkbox-and-label-container {
     display: flex;
     align-items: center;
-    width: 70%;
+    width: 7%;
 }
 
 .div-form {

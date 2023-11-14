@@ -6,11 +6,13 @@ import { format } from 'date-fns';
 //  ToDo
 //  - Add description and priority to tasks
 
-//  - Add editing feature for renaming tasks and projects
+// Add sorting function, sort by date or alphabetically
 
-//  - Fix cross project task naming conflicts. same name tasks shouldn't be able to 
-//  change status of other tasks in other projects with the same name.
-//  The main issue will be in default date projects like 'Today'.
+//  - Fix delete function for the default projects using the attribute value of divs.
+//  - change functions and implementations so only task and project objects are passed
+//  in place of strings.
+
+// separate DOM concerns to reduce the size of this file.
 
 // Create drag and drop feature for reordering tasks and projects
 
@@ -54,7 +56,7 @@ const UI = {
         const date = e.target.innerText;
         const tasks = storage.filter_dates(date);
         const project = CreateProject(date);
-        project.setTasks(tasks);
+        project.setAllTasks(tasks);
         UI.create_task_preview(project);
     },
 
@@ -68,7 +70,7 @@ const UI = {
         while (projects_container.children.length > 1) {
             projects_container.removeChild(projects_container.firstChild)
         }
-        // adds all projects to the project 'left nav bar' that are not the default projects
+        // Adds projects to view
         list.forEach(project => {
             let project_name = project.getName();
             if (project_name == 'default') {return}
@@ -90,7 +92,7 @@ const UI = {
         );
     },
 
-// Temporary projects for content on start up //
+//////////// Temporary projects for content on start up ////////////
     create_temp_projects () {
         storage.addProject(CreateProject('House Cleaning'))
         storage.addProject(CreateProject('Car Maintenance'))
@@ -135,14 +137,19 @@ const UI = {
             project_title.classList.add('project_title')
             project_title.innerText = project.getName()
         task_preview.append(project_title)
+        
+        // create task elements
         const tasks = project.getTasks()
         tasks.forEach(task => {
             const task_box = document.createElement('div')
                 task_box.classList.add('task')
+                task_box.setAttribute('data-value', task.getProject())
             const task_label = document.createElement('label')
                 task_label.classList.add('checkbox-and-label-container')
-            const text = document.createTextNode(`${task.getName()}`)
-       
+            const task_name_holder = document.createElement('p')
+                task_name_holder.innerText = task.getName()
+                UI.make_editable(task_name_holder)
+
         // Create checkbox //
             const checkbox_input = document.createElement('input')
                 checkbox_input.classList.add('checkbox__input')
@@ -150,17 +157,18 @@ const UI = {
             const check_box = document.createElement('div')
                 check_box.classList.add('checkbox__box')
                 checkbox_input.checked = task.getStatus()
+
         // Date elements //
             const date = UI.create_date_element(task.getFormattedDate())
         
         // Create delete task button //
             const remove = UI.create_remove_button()
-        
+
         // Insert Task elements in to DOM //
             date.lastChild.addEventListener('change', UI.update_date, false)
-            checkbox_input.addEventListener('change', UI.update_status, false)
-            task_label.append(checkbox_input, check_box, text)
-            task_box.append(task_label, date, remove)
+            checkbox_input.addEventListener('click', UI.update_status, false)
+            task_label.append(checkbox_input, check_box)
+            task_box.append(task_label, task_name_holder, date, remove) //, edit)
             task_preview.append(task_box)
         })
         if (add_task.classList.contains('hide')) add_task.classList.remove('hide')
@@ -195,6 +203,17 @@ const UI = {
             bin.addEventListener('click', this.remove_task, false)
         remove.append(bin)
         return remove
+    },
+
+    create_edit_button() {
+        const edit_div = document.createElement('div')
+            edit_div.classList.add('edit-task-div')
+        const edit_image = document.createElement('span')
+            edit_image.classList.add('material-symbols-outlined')
+            edit_image.textContent = 'edit'
+            edit_image.addEventListener('click', this.edit_task, false)
+        edit_div.append(edit_image)
+        return edit_div
     },
 
     create_partial_form () {
@@ -299,8 +318,10 @@ const UI = {
     },
 
     update_status (e) {
-        const task = e.target.parentNode.innerText
-        storage.update_status(storage.getList().getCurrent(), task)
+        const task = e.target.parentNode.parentNode.children[1].innerText
+        console.log(task)
+        const project = e.target.parentNode.parentNode.getAttribute('data-value')
+        storage.update_status(project, task)
     },
 
     remove_project (e) {
@@ -315,7 +336,46 @@ const UI = {
         const project = storage.getList().getCurrent()
         storage.deleteTask(project, task_name)
         UI.create_task_preview(storage.getProject(project))
+    },
+
+    make_editable(div) {
+         
+         div.addEventListener('mouseenter', () => {
+            // Add styling or any other effects when hovering
+            div.style.border = '1px solid #000';
+          });
+          
+          div.addEventListener('mouseleave', () => {
+            // Remove styling when not hovering
+            div.style.border = 'none';
+          });
+          
+          div.addEventListener('click', () => {
+            // Enable editing when clicked
+            div.contentEditable = 'true';
+            const current_name = div.innerText
+            div.setAttribute('data-value', current_name)
+          });
+
+          div.addEventListener('input', () => {
+            // Handle changes to the text content
+            const newText = div.innerText;
+            console.log('Text changed:', newText);
+          });
+          
+          div.addEventListener('blur', () => {
+            // Disable editing when focus is lost
+            div.contentEditable = 'false';
+            const task = div.getAttribute('data-value')
+            const new_task_name = div.innerText
+            const project = div.parentNode.getAttribute('data-value')
+            div.removeAttribute('data-value')
+            storage.renameTask(project, task, new_task_name)
+          });
+         
+
     }
+
 }
 
 export { UI }

@@ -20,10 +20,15 @@ const Project_proto = {
     },
 
     setTasks (tasks) { tasks.forEach(task => {
-        if (this.tasks.includes(task) === false ) {this.setTask(task)}
-        else this.replaceTask(task);
-    } 
-    )},
+        this.setTask(task)
+        })
+    },
+
+    setAllTasks (tasks) {
+        tasks.forEach(task => {
+            this.tasks.push(task)
+        })
+    },
 
     deleteTask (task) {
         const name = typeof task === 'string' ? task : task.getName();

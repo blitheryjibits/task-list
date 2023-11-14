@@ -55,7 +55,8 @@ const storage = {
         this.saveList(_list);
     },
 
-    // Functions for accessing Tasks in Local Storage //
+////////////// Functions for accessing Tasks in Local Storage //////////////
+
     addTask (project, task) {
     // this function uses the project related to the task in task.project to ensure that the 
     // project containing the task is updated when the task is altered in the 
@@ -117,29 +118,33 @@ const storage = {
     // the filtered view can be reflected in the original project holding the task.
     filter_dates(date) {
         const today = format(new Date(), 'yyyy-MM-dd')
+        const week = format(addWeeks(new Date(), 1), 'yyyy-MM-dd')
+        const month = format(addMonths(new Date(), 1), 'yyyy-MM-dd')
+        if (date instanceof Date) { const alternateDate = format(date, 'yyyy-MM-dd') }
         let tasks = []
         this.getList().getProjects().forEach(project => {
+            if (project.getName() === 'default') return
             switch (date) {
                 case 'Today':
                     tasks = tasks.concat(project.getTasks().filter(task => task.getFormattedDate() == today))
                     break;
                 case 'This Week':
-                    tasks = tasks.concat(project.getTasks().filter(task => task.getFormattedDate() < addWeeks(today, 1)))
+                    tasks = tasks.concat(project.getTasks().filter(task => task.getFormattedDate() < week))
                     break;
                 case 'This Month':
-                    tasks = tasks.concat(project.getTasks().filter(task => task.getFormattedDate() < addMonths(today, 1)))
+                    tasks = tasks.concat(project.getTasks().filter(task => task.getFormattedDate() < month))
                     break;
                 case 'Overdue':
                     tasks = tasks.concat(project.getTasks().filter(task => task.getFormattedDate() < today))
                     break;
                 default:
-                    tasks = tasks.concat(project.getTasks().filter(task => task.getFormattedDate() === today))
+                    tasks = tasks.concat(project.getTasks().filter(task => task.getFormattedDate() === alternateDate))
                     break;
             }
         })
         this.update_current(date);
         const list = this.getList();
-        list.getProject('default').setTasks(tasks);
+        list.getProject('default').setAllTasks(tasks)
         this.saveList(list)
         return tasks;
     }
