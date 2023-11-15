@@ -29,10 +29,6 @@ const UI = {
         UI.init_add_task_button();
         UI.init_add_project_button();
     },
-    
-    find_current_project () {
-        return storage.getList().getCurrent()
-    },
 
     load_projects() {     
         UI.init_projects(storage.getList().getProjects())
@@ -205,17 +201,6 @@ const UI = {
         return remove
     },
 
-    create_edit_button() {
-        const edit_div = document.createElement('div')
-            edit_div.classList.add('edit-task-div')
-        const edit_image = document.createElement('span')
-            edit_image.classList.add('material-symbols-outlined')
-            edit_image.textContent = 'edit'
-            edit_image.addEventListener('click', this.edit_task, false)
-        edit_div.append(edit_image)
-        return edit_div
-    },
-
     create_partial_form () {
         const div = document.createElement('div')
             div.classList.add('div-form')
@@ -332,35 +317,37 @@ const UI = {
     },
 
     remove_task (e) {
-        const task_name = e.target.parentNode.parentNode.children[0].innerText
-        const project = storage.getList().getCurrent()
-        storage.deleteTask(project, task_name)
-        UI.create_task_preview(storage.getProject(project))
+        const task_name = e.target.parentNode.parentNode.children[1].innerText
+        const task_project = e.target.parentNode.parentNode.getAttribute('data-value')
+        const current_project = document.querySelector('div.project_title').innerText
+        storage.deleteTask(task_project, task_name)
+
+        if (current_project !== storage.getList().getCurrent()) {
+            const temp_project = CreateProject(current_project)
+            temp_project.setAllTasks(storage.filter_dates(current_project))
+            UI.create_task_preview(temp_project)  
+        } else {
+            UI.create_task_preview(storage.getProject(project))
+        }
     },
 
     make_editable(div) {
          
-         div.addEventListener('mouseenter', () => {
-            // Add styling or any other effects when hovering
-            div.style.border = '1px solid #000';
-          });
+        //  div.addEventListener('mouseenter', () => {
+        //     // Add styling or any other effects when hovering
+        //     div.style.border = '1px solid #000';
+        //   });
           
-          div.addEventListener('mouseleave', () => {
-            // Remove styling when not hovering
-            div.style.border = 'none';
-          });
+        //   div.addEventListener('mouseleave', () => {
+        //     // Remove styling when not hovering
+        //     div.style.border = 'none';
+        //   });
           
           div.addEventListener('click', () => {
             // Enable editing when clicked
             div.contentEditable = 'true';
             const current_name = div.innerText
             div.setAttribute('data-value', current_name)
-          });
-
-          div.addEventListener('input', () => {
-            // Handle changes to the text content
-            const newText = div.innerText;
-            console.log('Text changed:', newText);
           });
           
           div.addEventListener('blur', () => {

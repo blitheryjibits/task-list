@@ -146,7 +146,9 @@ main {
     border-radius: 20px;
     font-family: var(--task-font);
 }
-
+.task p:hover {
+    cursor: url('../src/images/fountain-pen-tip.png'), pointer;
+}
 .remove_task {
     display: flex;
     justify-content: center;
