@@ -19,7 +19,8 @@ const Project_proto = {
         }
     },
 
-    setTasks (tasks) { tasks.forEach(task => {
+    setTasks (tasks) { 
+        tasks.forEach(task => {
         this.setTask(task)
         })
     },

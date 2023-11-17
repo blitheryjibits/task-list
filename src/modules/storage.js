@@ -122,6 +122,7 @@ const storage = {
         const month = format(addMonths(new Date(), 1), 'yyyy-MM-dd')
         if (date instanceof Date) { const alternateDate = format(date, 'yyyy-MM-dd') }
         let tasks = []
+        //default_tasks will carry over any tasks that do not have a specified project
         this.getList().getProjects().forEach(project => {
             if (project.getName() === 'default') return
             switch (date) {

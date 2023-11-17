@@ -54,6 +54,7 @@ const UI = {
         const project = CreateProject(date);
         project.setAllTasks(tasks);
         UI.create_task_preview(project);
+
     },
 
 // Displays loaded projects as buttons in API - called in load_projects//
@@ -168,6 +169,7 @@ const UI = {
             task_preview.append(task_box)
         })
         if (add_task.classList.contains('hide')) add_task.classList.remove('hide')
+        if (storage.getList().getCurrent().getName() == 'default') add_task.classList.add('hide')
         if (add_project.classList.contains('hide')) add_project.classList.remove('hide')
     },
 
@@ -267,7 +269,6 @@ const UI = {
         new_task.setDueDate(task_date)
         new_task.setProject(project.getName())
         storage.addTask(project, new_task)
-        storage.update_task_date(project, task_name, task_date) // remove this line?
         UI.remove_form()
         UI.create_task_preview(storage.getProject(project))
         document.querySelector('.add-task-button').classList.remove('hide')
@@ -294,12 +295,16 @@ const UI = {
     },
 
     update_date (e) {
-        const date = e.target.value
-        const name = e.target.parentNode.parentNode.children[0].innerText
-        const project = storage.getList().getCurrent()
-        const task = project.getTask(name)
-        storage.update_task_date(project, task, date)
-        UI.create_task_preview(storage.getProject(project))
+        const div = e.target
+        const date = div.value
+        const taskbox = div.parentNode.parentNode
+        const name = taskbox.children[1].innerText
+        const project = taskbox.getAttribute('data-value')
+        const display_project = taskbox.parentNode.children[0].innerText
+        storage.update_task_date(project, name, date)
+        const temp_project = CreateProject(display_project)
+        temp_project.setAllTasks(storage.filter_dates(display_project))
+        UI.create_task_preview(temp_project)
     },
 
     update_status (e) {
