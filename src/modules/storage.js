@@ -116,14 +116,30 @@ const storage = {
     // sends filtered tasks back to DOMInterface for display.
     // also, updates default project with filtered tasks so any changes made in
     // the filtered view can be reflected in the original project holding the task.
+    // ...existing code...
     filter_dates(date) {
         const today = format(new Date(), 'yyyy-MM-dd')
         const week = format(addWeeks(new Date(), 1), 'yyyy-MM-dd')
         const month = format(addMonths(new Date(), 1), 'yyyy-MM-dd')
-        if (date instanceof Date) { const alternateDate = format(date, 'yyyy-MM-dd') }
         let tasks = []
-        //default_tasks will carry over any tasks that do not have a specified project
-        this.getList().getProjects().forEach(project => {
+        const list = this.getList();
+        const projects = list.getProjects();
+
+        // If date matches a project name, filter only that project
+        const projectNames = projects.map(p => p.getName());
+        if (projectNames.includes(date)) {
+            const project = list.getProject(date);
+            if (project) {
+                tasks = project.getTasks();
+            }
+            // Update default project and return
+            list.getProject('default').setAllTasks(tasks);
+            this.saveList(list);
+            return tasks;
+        }
+
+        // Otherwise, filter by date as before
+        projects.forEach(project => {
             if (project.getName() === 'default') return
             switch (date) {
                 case 'Today':
@@ -139,12 +155,11 @@ const storage = {
                     tasks = tasks.concat(project.getTasks().filter(task => task.getFormattedDate() < today))
                     break;
                 default:
-                    tasks = tasks.concat(project.getTasks().filter(task => task.getFormattedDate() === alternateDate))
+                    tasks = tasks.concat(project.getTasks().filter(task => task.getFormattedDate() == date))
                     break;
             }
         })
         this.update_current(date);
-        const list = this.getList();
         list.getProject('default').setAllTasks(tasks)
         this.saveList(list)
         return tasks;
