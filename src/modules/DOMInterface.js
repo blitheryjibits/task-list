@@ -337,16 +337,6 @@ const UI = {
     },
 
     make_editable(div) {
-         
-        //  div.addEventListener('mouseenter', () => {
-        //     // Add styling or any other effects when hovering
-        //     div.style.border = '1px solid #000';
-        //   });
-          
-        //   div.addEventListener('mouseleave', () => {
-        //     // Remove styling when not hovering
-        //     div.style.border = 'none';
-        //   });
           
           div.addEventListener('click', () => {
             // Enable editing when clicked
